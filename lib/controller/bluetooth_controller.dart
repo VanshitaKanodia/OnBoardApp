@@ -1,58 +1,44 @@
-import 'dart:collection';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class BluetoothController extends GetxController{
+
   FlutterBlue flutterBlue = FlutterBlue.instance;
-  Future scanDevices() async {
-    if(await Permission.bluetoothScan.request().isGranted)
-      {
-        print('Scanning has been Started but devices has not been there');
-        flutterBlue.startScan(timeout: const Duration(seconds: 5));
 
-        flutterBlue.stopScan();
+  Future<List<BluetoothDevice>> scanDevices() async {
+    List<BluetoothDevice> devices = [];
+
+    while(true){
+      final statusScan = await Permission.bluetoothScan.request();
+      final statusConnect = await Permission.bluetoothConnect.request();
+
+      if(statusScan.isGranted && statusConnect.isGranted){
+        debugPrint("permission granted");
+        try{
+          await flutterBlue.startScan(timeout: const Duration(seconds: 4));
+
+          flutterBlue.scanResults.listen((results) {
+            for (ScanResult result in results) {
+              if (!devices.contains(result.device)) {
+                devices.add(result.device);
+              }
+            }
+          });
+          debugPrint(devices.toString());
+
+          await Future.delayed(const Duration(seconds: 4));
+
+          await flutterBlue.stopScan();
+          break;
+        } catch (e) {
+          debugPrint('Error scanning for devices: $e');
+        }
+      } else {
+        debugPrint("permission not granted");
       }
+    }
+    return devices;
   }
-
-  Stream<List<ScanResult>> get scanResults => flutterBlue.scanResults;
 }
-
-
-
-// class BleController extends GetxController{
-//
-//   FlutterBlue ble = FlutterBlue.instance;
-//
-// // This Function will help users to scan near by BLE devices and get the list of Bluetooth devices.
-//   Future scanDevices() async{
-//     if(await Permission.bluetoothScan.request().isGranted){
-//       if(await Permission.bluetoothConnect.request().isGranted){
-//         ble.startScan(timeout: Duration(seconds: 15));
-//
-//         ble.stopScan();
-//       }
-//     }
-//   }
-//
-// // This function will help user to connect to BLE devices.
-//   Future<void> connectToDevice(BluetoothDevice device)async {
-//     await device?.connect(timeout: Duration(seconds: 15));
-//
-//     device?.state.listen((isConnected) {
-//       if(isConnected == BluetoothDeviceState.connecting){
-//         print("Device connecting to: ${device.name}");
-//       }else if(isConnected == BluetoothDeviceState.connected){
-//         print("Device connected: ${device.name}");
-//       }else{
-//         print("Device Disconnected");
-//       }
-//     });
-//
-//   }
-//
-//   Stream<List<ScanResult>> get scanResults => ble.scanResults;
-//
-// }

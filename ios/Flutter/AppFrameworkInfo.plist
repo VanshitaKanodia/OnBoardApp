@@ -4,6 +4,12 @@
 <dict>
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>This app needs access to Bluetooth for scanning devices.</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>This app needs access to Bluetooth for scanning devices.</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>This app needs access to Bluetooth for scanning devices.</string>
   <key>CFBundleExecutable</key>
   <string>App</string>
   <key>CFBundleIdentifier</key>
