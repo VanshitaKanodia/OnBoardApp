@@ -14,21 +14,25 @@ class BluetoothController extends GetxController{
       final statusScan = await Permission.bluetoothScan.request();
       final statusConnect = await Permission.bluetoothConnect.request();
 
-      if(statusScan.isGranted && statusConnect.isGranted){
+      if(await Permission.bluetoothScan.isDenied)
+        {
+          await Permission.bluetoothScan.request();
+        }
+      else if(statusScan.isGranted && statusConnect.isGranted){
         debugPrint("permission granted");
         try{
-          await flutterBlue.startScan(timeout: const Duration(seconds: 4));
+          await flutterBlue.startScan(timeout: const Duration(seconds: 3));
 
           flutterBlue.scanResults.listen((results) {
             for (ScanResult result in results) {
-              if (!devices.contains(result.device)) {
-                devices.add(result.device);
+              if (!devices.contains(result.device) && result.device.name.startsWith("BM")) {
+                  devices.add(result.device);
               }
             }
           });
           debugPrint(devices.toString());
 
-          await Future.delayed(const Duration(seconds: 4));
+          await Future.delayed(const Duration(seconds: 3));
 
           await flutterBlue.stopScan();
           break;
