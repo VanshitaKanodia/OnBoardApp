@@ -29,6 +29,7 @@ class QueryPageState extends State<QueryPage> {
   FlutterTts flutterTts = FlutterTts();
 
 
+
   void toggleConnection()
   {
     setState(() {

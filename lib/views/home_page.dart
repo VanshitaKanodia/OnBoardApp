@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/query.dart';
 
 
@@ -19,12 +20,16 @@ class _HomePageState extends State<HomePage> {
   void _toggleQuery(bool value) {
     setState(() {
       isQueryEnabled = value;
+      isAutoQueryEnabled = false;
+      isFavouriteModeEnabled = false;
     });
   }
 
   void _toggleAutoQuery(bool value) {
     setState(() {
       isAutoQueryEnabled = value;
+      isQueryEnabled = false;
+      isFavouriteModeEnabled = false;
     });
   }
 
@@ -34,6 +39,8 @@ class _HomePageState extends State<HomePage> {
   void _toggleFavouriteMode(bool value) {
     setState(() {
       isFavouriteModeEnabled = value;
+      isQueryEnabled = false;
+      isAutoQueryEnabled = false;
     });
   }
 
@@ -73,15 +80,16 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: isQueryEnabled ?
+                                () {
                               // Handle button 1 action
                               Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
-                            },
+                            } : null,
                             child:
                                 Text('Query'),
                           ),
                           Switch(
-                                  value:  isQueryEnabled,
+                                  value: isQueryEnabled,
                                   onChanged: _toggleQuery,
                                   activeTrackColor: Colors.lightGreenAccent,
                                   activeColor: Colors.green,
@@ -92,10 +100,10 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: isAutoQueryEnabled ? () {
                               // Handle button 1 action
-                              // Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
-                            },
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AutoQueryPage(title: "Autoquery")));
+                            } : null,
                             child:
                             Text('Auto-Query'),
                           ),
@@ -111,10 +119,10 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: isFavouriteModeEnabled ? () {
                               // Handle button 1 action
                               // Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
-                            },
+                            }: null,
                             child:
                             Text('Favourite Mode'),
                           ),
