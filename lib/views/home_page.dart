@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       isSwitched = value;
     });
   }
-  ////some great changes
+
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                                 Text('Query'),
                           ),
                           Switch(
-                                  value: isQueryEnabled,
+                                  value:  isQueryEnabled,
                                   onChanged: _toggleQuery,
                                   activeTrackColor: Colors.lightGreenAccent,
                                   activeColor: Colors.green,
@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
                           ElevatedButton(
                             onPressed: () {
                               // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                              // Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
                             },
                             child:
                             Text('Auto-Query'),
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                           ElevatedButton(
                             onPressed: () {
                               // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                              // Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
                             },
                             child:
                             Text('Favourite Mode'),

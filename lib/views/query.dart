@@ -1,77 +1,55 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_blue/flutter_blue.dart';
-// import 'package:iwayplus_bluetooth/controller/bluetooth_controller.dart';
-//
-// class QueryMode extends StatefulWidget {
-//   const QueryMode({super.key});
-//
-//   @override
-//   State<QueryMode> createState() => _QueryModeState();
-// }
-//
-// class _QueryModeState extends State<QueryMode> {
-//   List<BluetoothDevice> _devices = [];
-//
-//   Future<void> _scanDevices() async {
-//     List<BluetoothDevice> devices = await BluetoothController().scanDevices();
-//     setState(() {
-//       _devices = devices;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Bluetooth Devices'),
-//         bottom: PreferredSize(
-//             preferredSize: const Size(100, 40),
-//             child: ElevatedButton(
-//                 onPressed: _scanDevices, child: const Text('Scan'))),
-//       ),
-//       body: ListView.builder(
-//         itemCount: _devices.length,
-//         itemBuilder: (context, index) {
-//           BluetoothDevice device = _devices[index];
-//           return ListTile(
-//             title: Text(device.name),
-//             subtitle: Text(device.id.toString()),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
-
-
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class QueryPage extends StatefulWidget {
   QueryPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
-  final List<BluetoothDevice> devicesList = <BluetoothDevice>[];
-  final Map<Guid, List<int>> readValues = <Guid, List<int>>{};
 
   @override
   QueryPageState createState() => QueryPageState();
 }
 
 class QueryPageState extends State<QueryPage> {
+
+  bool isConnected = false;
   final _writeController = TextEditingController();
   BluetoothDevice? _connectedDevice;
   List<BluetoothService> _services = [];
+  List<BluetoothDevice> devicesList = <BluetoothDevice>[];
+  Map<Guid, List<int>> readValues = <Guid, List<int>>{};
+  Map<String, Timer?> disconnectTimers = {};
+  Map<String, bool> deviceConnectionStatus = {};
+  FlutterTts flutterTts = FlutterTts();
 
-  _addDeviceTolist(final BluetoothDevice device) {
-    if (!widget.devicesList.contains(device)) {
+
+  void toggleConnection()
+  {
+    setState(() {
+      isConnected = !isConnected;
+    });
+  }
+
+   _addDeviceTolist(final BluetoothDevice device) {
+    if (!devicesList.contains(device)) {
       setState(() {
-        widget.devicesList.add(device);
+        devicesList.add(device);
+      });
+    }
+  }
+
+  void disconnectDevice() async {
+    if (_connectedDevice != null) {
+      await _connectedDevice!.disconnect();
+      setState(() {
+        _connectedDevice = null;
+        _services.clear();
       });
     }
   }
@@ -94,6 +72,8 @@ class QueryPageState extends State<QueryPage> {
       ),
     );
 
+
+
     FlutterBluePlus.cancelWhenScanComplete(subscription);
 
     await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
@@ -101,10 +81,14 @@ class QueryPageState extends State<QueryPage> {
     await FlutterBluePlus.startScan();
 
     await FlutterBluePlus.isScanning.where((val) => val == false).first;
+
     FlutterBluePlus.connectedDevices.map((device) {
       _addDeviceTolist(device);
     });
   }
+
+
+
 
   @override
   void initState() {
@@ -128,7 +112,24 @@ class QueryPageState extends State<QueryPage> {
 
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
-    for (BluetoothDevice device in widget.devicesList) {
+    for (BluetoothDevice device in devicesList) {
+      String deviceId = device.id.toString();
+
+      void _startDisconnectTimer(String deviceId) {
+        disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () async {
+          // Disconnect the device after 30 seconds
+          await device.disconnect();
+          setState(() {
+            deviceConnectionStatus[deviceId] = false;
+          });
+        });
+      }
+
+      void _cancelDisconnectTimer(String deviceId) {
+        if (disconnectTimers[deviceId] != null) {
+          disconnectTimers[deviceId]!.cancel();
+        }
+      }
       containers.add(
         SizedBox(
           height: 50,
@@ -143,27 +144,54 @@ class QueryPageState extends State<QueryPage> {
                 ),
               ),
               TextButton(
-                child: const Text(
-                  'Connect',
+                child: Text(
+                  deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!
+                      ? 'Disconnect'
+                      : 'Connect',
                   style: TextStyle(color: Colors.black),
                 ),
                 onPressed: () async {
+                  print('-------print--------');
+                  print(deviceConnectionStatus.containsKey(deviceId));
+                  if(deviceConnectionStatus.containsKey(deviceId)) {
+
+                    print('---Device ID-----');
+                    print(deviceConnectionStatus[deviceId]);
+                  }
+                  else
+                    {
+                      print('Device ID- if false');
+                      print(deviceConnectionStatus[deviceId]);
+                    }
                   FlutterBluePlus.stopScan();
                   try {
                     await device.connect();
+                    if (deviceConnectionStatus.containsKey(deviceId) && !deviceConnectionStatus[deviceId]!) {
+                      await device.connect();
+                      _startDisconnectTimer(deviceId);
+                    } else {
+                      await device.disconnect();
+                      _cancelDisconnectTimer(device.id.toString());
+                    }
                   } on PlatformException catch (e) {
                     if (e.code != 'already_connected') {
                       rethrow;
                     }
-                  }
-                  finally {
+                  } finally {
                     _services = await device.discoverServices();
                   }
-                  // setState(() {
-                  //   _connectedDevice = device;
-                  // });
                 },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                    if (deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!) {
+                      return Colors.green;
+                    } else {
+                      return Colors.grey;
+                    }
+                  }),
+                ),
               ),
+
             ],
           ),
         ),
@@ -193,7 +221,7 @@ class QueryPageState extends State<QueryPage> {
               onPressed: () async {
                 var sub = characteristic.lastValueStream.listen((value) {
                   setState(() {
-                    widget.readValues[characteristic.uuid] = value;
+                    readValues[characteristic.uuid] = value;
                   });
                 });
                 await characteristic.read();
@@ -263,7 +291,7 @@ class QueryPageState extends State<QueryPage> {
               onPressed: () async {
                 characteristic.lastValueStream.listen((value) {
                   setState(() {
-                    widget.readValues[characteristic.uuid] = value;
+                    readValues[characteristic.uuid] = value;
                   });
                 });
                 await characteristic.setNotifyValue(true);
@@ -301,7 +329,7 @@ class QueryPageState extends State<QueryPage> {
                 ),
                 Row(
                   children: <Widget>[
-                    Expanded(child: Text('Value: ${widget.readValues[characteristic.uuid]}')),
+                    Expanded(child: Text('Value: ${readValues[characteristic.uuid]}')),
                   ],
                 ),
                 const Divider(),
