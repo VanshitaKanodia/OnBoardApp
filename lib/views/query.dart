@@ -45,12 +45,13 @@ class QueryPageState extends State<QueryPage> {
     }
   }
 
-  void disconnectDevice() async {
+  void disconnectDevice(String deviceId) async {
     if (_connectedDevice != null) {
       await _connectedDevice!.disconnect();
       setState(() {
         _connectedDevice = null;
         _services.clear();
+        // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
       });
     }
   }
@@ -111,17 +112,28 @@ class QueryPageState extends State<QueryPage> {
     super.initState();
   }
 
+  void _speakDeviceName(String name) async {
+    await flutterTts.speak(name);
+  }
+
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
     for (BluetoothDevice device in devicesList) {
       String deviceId = device.id.toString();
 
+      void _startConnecting(String deviceId) async {
+        await device.connect();
+        setState(() {
+          deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+        });
+      }
+
       void _startDisconnectTimer(String deviceId) {
-        disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () async {
-          // Disconnect the device after 30 seconds
-          await device.disconnect();
+        disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () {
+          // Disconnect the device after 2 seconds
+          device.disconnect();
           setState(() {
-            deviceConnectionStatus[deviceId] = false;
+            deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
           });
         });
       }
@@ -147,33 +159,35 @@ class QueryPageState extends State<QueryPage> {
               TextButton(
                 child: Text(
                   deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!
-                      ? 'Disconnect'
+                      ? 'Connected'
                       : 'Connect',
                   style: TextStyle(color: Colors.black),
                 ),
                 onPressed: () async {
-                  print('-------print--------');
-                  print(deviceConnectionStatus.containsKey(deviceId));
-                  if(deviceConnectionStatus.containsKey(deviceId)) {
-
-                    print('---Device ID-----');
-                    print(deviceConnectionStatus[deviceId]);
-                  }
-                  else
-                    {
-                      print('Device ID- if false');
-                      print(deviceConnectionStatus[deviceId]);
-                    }
+                  // print('-------print--------');
+                  // print(deviceConnectionStatus.containsKey(deviceId));
+                  // if(deviceConnectionStatus.containsKey(deviceId)) {
+                  //
+                  //   print('---Device ID-----');
+                  //   print(deviceConnectionStatus[deviceId]);
+                  // }
+                  // else
+                  //   {
+                  //     print('Device ID- if false');
+                  //     print(deviceConnectionStatus[deviceId]);
+                  //   }
                   FlutterBluePlus.stopScan();
                   try {
-                    await device.connect();
+                    // await device.connect();
+                    _startConnecting(deviceId);
                     if (deviceConnectionStatus.containsKey(deviceId) && !deviceConnectionStatus[deviceId]!) {
-                      await device.connect();
+                      // await device.connect();
                       _startDisconnectTimer(deviceId);
-                    } else {
-                      await device.disconnect();
-                      _cancelDisconnectTimer(device.id.toString());
                     }
+                    // else {
+                    //   await device.disconnect();
+                    //   _cancelDisconnectTimer(device.id.toString());
+                    // }
                   } on PlatformException catch (e) {
                     if (e.code != 'already_connected') {
                       rethrow;

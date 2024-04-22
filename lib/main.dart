@@ -24,7 +24,10 @@
 import 'package:flutter/material.dart';
 import 'package:iwayplus_bluetooth/views/home_page.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

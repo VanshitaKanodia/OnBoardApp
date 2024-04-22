@@ -107,6 +107,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     for (BluetoothDevice device in devicesList) {
       String deviceId = device.id.toString();
 
+
       void _startDisconnectTimer(String deviceId) {
         disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () async {
           // Disconnect the device after 30 seconds
@@ -131,10 +132,6 @@ class AutoQueryPageState extends State<AutoQueryPage> {
           await device.connect();
           _startDisconnectTimer(device.id.toString());
         }
-        else
-          {
-
-          }
       }
 
       // Function to handle automatic disconnection logic
@@ -150,7 +147,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
       // Function to handle background scanning and connection logic
       void startAutoConnection() {
         // Start periodic scanning for devices
-        Timer.periodic(Duration(seconds: 5), (Timer timer) async {
+        Timer.periodic(Duration(seconds: 0), (Timer timer) async {
           await _initBluetooth(); // Scan for nearby devices
 
           // Iterate through discovered devices and perform auto connection
