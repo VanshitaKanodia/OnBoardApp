@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-import 'package:iwayplus_bluetooth/controller/bluetooth_controller.dart';
+import 'package:iwayplus_bluetooth/views/query.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,37 +10,128 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<BluetoothDevice> _devices = [];
+  bool isSwitched = false;
+  TextEditingController _searchController = TextEditingController();
+  bool isQueryEnabled = false;
+  bool isAutoQueryEnabled = false;
+  bool isFavouriteModeEnabled = false;
 
-  Future<void> _scanDevices() async {
-    List<BluetoothDevice> devices = await BluetoothController().scanDevices();
+  void _toggleQuery(bool value) {
     setState(() {
-      _devices = devices;
+      isQueryEnabled = value;
     });
   }
 
+  void _toggleAutoQuery(bool value) {
+    setState(() {
+      isAutoQueryEnabled = value;
+    });
+  }
+
+
+
+
+  void _toggleFavouriteMode(bool value) {
+    setState(() {
+      isFavouriteModeEnabled = value;
+    });
+  }
+
+  void _toggleSwitch(bool value) {
+    setState(() {
+      isSwitched = value;
+    });
+  }
   ////some great changes
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bluetooth Devices'),
-        bottom: PreferredSize(
-            preferredSize: const Size(100, 40),
-            child: ElevatedButton(
-                onPressed: _scanDevices, child: const Text('Scan'))),
-      ),
-      body: ListView.builder(
-        itemCount: _devices.length,
-        itemBuilder: (context, index) {
-          BluetoothDevice device = _devices[index];
-          return ListTile(
-            title: Text(device.name),
-            subtitle: Text(device.id.toString()),
-          );
-        },
-      ),
+        body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextFormField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          labelText: 'Search',
+                          hintText: 'Enter your search query',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          // Perform search based on the entered query
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle button 1 action
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                            },
+                            child:
+                                Text('Query'),
+                          ),
+                          Switch(
+                                  value: isQueryEnabled,
+                                  onChanged: _toggleQuery,
+                                  activeTrackColor: Colors.lightGreenAccent,
+                                  activeColor: Colors.green,
+                                ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle button 1 action
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                            },
+                            child:
+                            Text('Auto-Query'),
+                          ),
+                          Switch(
+                            value: isAutoQueryEnabled,
+                            onChanged: _toggleAutoQuery,
+                            activeTrackColor: Colors.lightGreenAccent,
+                            activeColor: Colors.green,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle button 1 action
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                            },
+                            child:
+                            Text('Favourite Mode'),
+                          ),
+                          Switch(
+                            value: isFavouriteModeEnabled,
+                            onChanged: _toggleFavouriteMode,
+                            activeTrackColor: Colors.lightGreenAccent,
+                            activeColor: Colors.green,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+        )
     );
   }
 }
