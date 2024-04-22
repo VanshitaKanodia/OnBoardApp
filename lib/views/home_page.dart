@@ -28,6 +28,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+
+
+
   void _toggleFavouriteMode(bool value) {
     setState(() {
       isFavouriteModeEnabled = value;
