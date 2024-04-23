@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iwayplus_bluetooth/views/Favourite.dart';
 import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/query.dart';
 
@@ -121,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                           ElevatedButton(
                             onPressed: isFavouriteModeEnabled ? () {
                               // Handle button 1 action
-                              // Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => FavouriteMode()));
                             }: null,
                             child:
                             Text('Favourite Mode'),

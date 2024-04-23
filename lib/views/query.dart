@@ -18,24 +18,16 @@ class QueryPage extends StatefulWidget {
 
 class QueryPageState extends State<QueryPage> {
 
-  bool isConnected = false;
+
   final _writeController = TextEditingController();
   BluetoothDevice? _connectedDevice;
   List<BluetoothService> _services = [];
   List<BluetoothDevice> devicesList = <BluetoothDevice>[];
   Map<Guid, List<int>> readValues = <Guid, List<int>>{};
   Map<String, Timer?> disconnectTimers = {};
-  Map<String, bool> deviceConnectionStatus = {};
   FlutterTts flutterTts = FlutterTts();
+  bool isDeviceConnected = true;
 
-
-
-  void toggleConnection()
-  {
-    setState(() {
-      isConnected = !isConnected;
-    });
-  }
 
    _addDeviceTolist(final BluetoothDevice device) {
     if (!devicesList.contains(device)) {
@@ -57,40 +49,51 @@ class QueryPageState extends State<QueryPage> {
   }
 
   _initBluetooth() async {
-    var subscription = FlutterBluePlus.onScanResults.listen(
-          (results) {
-        if (results.isNotEmpty) {
-          for (ScanResult result in results) {
-            if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
+    var scanP = await Permission.bluetoothScan.request();
+    var connectP = await Permission.bluetoothConnect.request();
+
+    print('Permissions are granting');
+
+    if(scanP.isGranted && connectP.isGranted){
+
+      print('Permission Granted');
+
+      var subscription = FlutterBluePlus.onScanResults.listen(
+            (results) {
+              print('Print the results $results');
+          if (results.isNotEmpty) {
+
+            print('result listened carefully');
+            for (ScanResult result in results) {
+              print('Devices are scanning');
+              // if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
               _addDeviceTolist(result.device);
+              // }
             }
           }
-        }
-      },
-      onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
+        },
+        onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+
+            content: Text(e.toString()),
+          ),
         ),
-      ),
-    );
+      );
 
+      FlutterBluePlus.cancelWhenScanComplete(subscription);
 
+      await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
 
-    FlutterBluePlus.cancelWhenScanComplete(subscription);
+      await FlutterBluePlus.startScan();
 
-    await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
+      await FlutterBluePlus.isScanning.where((val) => val == false).first;
 
-    await FlutterBluePlus.startScan();
+      FlutterBluePlus.connectedDevices.map((device) {
+        _addDeviceTolist(device);
+      });
+    }
 
-    await FlutterBluePlus.isScanning.where((val) => val == false).first;
-
-    FlutterBluePlus.connectedDevices.map((device) {
-      _addDeviceTolist(device);
-    });
   }
-
-
-
 
   @override
   void initState() {
@@ -124,7 +127,8 @@ class QueryPageState extends State<QueryPage> {
       void _startConnecting(String deviceId) async {
         await device.connect();
         setState(() {
-          deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+          // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+          isDeviceConnected = !isDeviceConnected;
         });
       }
 
@@ -133,7 +137,8 @@ class QueryPageState extends State<QueryPage> {
           // Disconnect the device after 2 seconds
           device.disconnect();
           setState(() {
-            deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+            // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+            isDeviceConnected = !isDeviceConnected;
           });
         });
       }
@@ -158,36 +163,20 @@ class QueryPageState extends State<QueryPage> {
               ),
               TextButton(
                 child: Text(
-                  deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!
+                  // deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!
+                  isDeviceConnected
                       ? 'Connected'
                       : 'Connect',
                   style: TextStyle(color: Colors.black),
                 ),
                 onPressed: () async {
-                  // print('-------print--------');
-                  // print(deviceConnectionStatus.containsKey(deviceId));
-                  // if(deviceConnectionStatus.containsKey(deviceId)) {
-                  //
-                  //   print('---Device ID-----');
-                  //   print(deviceConnectionStatus[deviceId]);
-                  // }
-                  // else
-                  //   {
-                  //     print('Device ID- if false');
-                  //     print(deviceConnectionStatus[deviceId]);
-                  //   }
                   FlutterBluePlus.stopScan();
                   try {
                     // await device.connect();
                     _startConnecting(deviceId);
-                    if (deviceConnectionStatus.containsKey(deviceId) && !deviceConnectionStatus[deviceId]!) {
-                      // await device.connect();
+                    if (isDeviceConnected) {
                       _startDisconnectTimer(deviceId);
                     }
-                    // else {
-                    //   await device.disconnect();
-                    //   _cancelDisconnectTimer(device.id.toString());
-                    // }
                   } on PlatformException catch (e) {
                     if (e.code != 'already_connected') {
                       rethrow;
@@ -198,7 +187,7 @@ class QueryPageState extends State<QueryPage> {
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                    if (deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!) {
+                    if (isDeviceConnected) {
                       return Colors.green;
                     } else {
                       return Colors.grey;
