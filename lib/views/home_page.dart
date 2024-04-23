@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                           ElevatedButton(
                             onPressed: isFavouriteModeEnabled ? () {
                               // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => FavouriteMode()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => FavouritePage()));
                             }: null,
                             child:
                             Text('Favourite Mode'),

@@ -1,34 +1,45 @@
 import 'package:flutter/material.dart';
 
-class FavouriteMode extends StatelessWidget {
-  List<Widget> containers = <Widget>[];
-  bool ifBuses = false;
+
+class FavouritePage extends StatefulWidget {
+  @override
+  _FavouritePageState createState() => _FavouritePageState();
+}
+
+class _FavouritePageState extends State<FavouritePage> {
+  List<BusInfo> busList = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
-        actions: [
-          ElevatedButton(onPressed: (){
-            _showBusInfoDialog(context);
-          },
-            child: Icon(Icons.add),)
-        ],
+        title: Text('Bus List'),
       ),
-      body: Center(
-        child: Text('Add Bus Info'),
-        ),
+      body: ListView.builder(
+        itemCount: busList.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text('Bus Number: ${busList[index].busNumber}'),
+            subtitle: Text('Route: ${busList[index].route}'),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showBusInfoDialog(context);
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 
+  void _showBusInfoDialog(BuildContext context) async {
+    String? busNumber;
+    String? route;
 
-  void _showBusInfoDialog(BuildContext context) {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
-        String busNumber = '';
-        String route = '';
         return AlertDialog(
           title: Text('Add Bus Info'),
           content: Column(
@@ -55,7 +66,17 @@ class FavouriteMode extends StatelessWidget {
               },
               child: Text('Cancel'),
             ),
-
+            TextButton(
+              onPressed: () {
+                if (busNumber != null && route != null) {
+                  setState(() {
+                    busList.add(BusInfo(busNumber!, route!));
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text('Add'),
+            ),
           ],
         );
       },
@@ -63,40 +84,9 @@ class FavouriteMode extends StatelessWidget {
   }
 }
 
-class BusInfoPage extends StatelessWidget {
+class BusInfo {
   final String busNumber;
   final String route;
 
-  BusInfoPage({required this.busNumber, required this.route});
-
-  @override
-  Widget build(BuildContext context) {
-    // Simulating RSSI ID
-    String rssiId = 'RSSI1234';
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Bus Info'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Bus Number: $busNumber',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Route: $route',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              'RSSI ID: $rssiId',
-              style: TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  BusInfo(this.busNumber, this.route);
 }

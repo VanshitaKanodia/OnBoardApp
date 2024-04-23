@@ -24,8 +24,9 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   List<BluetoothDevice> devicesList = <BluetoothDevice>[];
   Map<Guid, List<int>> readValues = <Guid, List<int>>{};
   Map<String, Timer?> disconnectTimers = {};
-  Map<String, bool> deviceConnectionStatus = {};
   FlutterTts flutterTts = FlutterTts();
+  bool isDeviceConnected = true;
+
 
   void toggleConnection() {
     setState(() {
@@ -51,35 +52,52 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     }
   }
 
+
   _initBluetooth() async {
-    var subscription = FlutterBluePlus.onScanResults.listen(
-          (results) {
-        if (results.isNotEmpty) {
-          for (ScanResult result in results) {
-            if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
+    var scanP = await Permission.bluetoothScan.request();
+    var connectP = await Permission.bluetoothConnect.request();
+
+    print('Permissions are granting');
+
+    if(scanP.isGranted && connectP.isGranted){
+
+      print('Permission Granted');
+
+      var subscription = FlutterBluePlus.onScanResults.listen(
+            (results) {
+          print('Print the results $results');
+          if (results.isNotEmpty) {
+
+            print('result listened carefully');
+            for (ScanResult result in results) {
+              print('Devices are scanning');
+              // if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
               _addDeviceTolist(result.device);
+              // }
             }
           }
-        }
-      },
-      onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
+        },
+        onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+
+            content: Text(e.toString()),
+          ),
         ),
-      ),
-    );
+      );
 
-    FlutterBluePlus.cancelWhenScanComplete(subscription);
+      FlutterBluePlus.cancelWhenScanComplete(subscription);
 
-    await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
+      await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
 
-    await FlutterBluePlus.startScan();
+      await FlutterBluePlus.startScan();
 
-    await FlutterBluePlus.isScanning.where((val) => val == false).first;
+      await FlutterBluePlus.isScanning.where((val) => val == false).first;
 
-    FlutterBluePlus.connectedDevices.map((device) {
-      _addDeviceTolist(device);
-    });
+      FlutterBluePlus.connectedDevices.map((device) {
+        _addDeviceTolist(device);
+      });
+    }
+
   }
 
   @override
@@ -110,10 +128,10 @@ class AutoQueryPageState extends State<AutoQueryPage> {
 
       void _startDisconnectTimer(String deviceId) {
         disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () async {
-          // Disconnect the device after 30 seconds
+          // Disconnect the device after 2 seconds
           await device.disconnect();
           setState(() {
-            deviceConnectionStatus[deviceId] = false;
+            isDeviceConnected = !isDeviceConnected;
           });
         });
       }
@@ -124,38 +142,6 @@ class AutoQueryPageState extends State<AutoQueryPage> {
         }
       }
 
-      // Function to handle automatic connection logic
-      void autoConnectToDevice(BluetoothDevice device) async {
-        if (!deviceConnectionStatus.containsKey(device.id.toString()) ||
-            !deviceConnectionStatus[device.id.toString()]!) {
-          // If the device is not connected, try to connect
-          await device.connect();
-          _startDisconnectTimer(device.id.toString());
-        }
-      }
-
-      // Function to handle automatic disconnection logic
-      void autoDisconnectFromDevice(BluetoothDevice device) async {
-        if (deviceConnectionStatus.containsKey(device.id.toString()) &&
-            deviceConnectionStatus[device.id.toString()]!) {
-          // If the device is connected, disconnect
-          await device.disconnect();
-          _cancelDisconnectTimer(device.id.toString());
-        }
-      }
-
-      // Function to handle background scanning and connection logic
-      void startAutoConnection() {
-        // Start periodic scanning for devices
-        Timer.periodic(Duration(seconds: 0), (Timer timer) async {
-          await _initBluetooth(); // Scan for nearby devices
-
-          // Iterate through discovered devices and perform auto connection
-          for (BluetoothDevice device in devicesList) {
-            autoConnectToDevice(device);
-          }
-        });
-      }
 
       containers.add(
         SizedBox(

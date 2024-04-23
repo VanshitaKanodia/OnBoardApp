@@ -163,7 +163,6 @@ class QueryPageState extends State<QueryPage> {
               ),
               TextButton(
                 child: Text(
-                  // deviceConnectionStatus.containsKey(deviceId) && deviceConnectionStatus[deviceId]!
                   isDeviceConnected
                       ? 'Connected'
                       : 'Connect',
