@@ -27,9 +27,10 @@ class QueryPageState extends State<QueryPage> {
   Map<String, Timer?> disconnectTimers = {};
   FlutterTts flutterTts = FlutterTts();
   bool isDeviceConnected = true;
+  Map<String, bool> deviceConnectionStatus = {};
 
 
-   _addDeviceTolist(final BluetoothDevice device) {
+  _addDeviceTolist(final BluetoothDevice device) {
     if (!devicesList.contains(device)) {
       setState(() {
         devicesList.add(device);
@@ -43,7 +44,6 @@ class QueryPageState extends State<QueryPage> {
       setState(() {
         _connectedDevice = null;
         _services.clear();
-        // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
       });
     }
   }
@@ -51,48 +51,38 @@ class QueryPageState extends State<QueryPage> {
   _initBluetooth() async {
     var scanP = await Permission.bluetoothScan.request();
     var connectP = await Permission.bluetoothConnect.request();
-
-    print('Permissions are granting');
-
-    if(scanP.isGranted && connectP.isGranted){
-
-      print('Permission Granted');
-
+    if (scanP.isGranted && connectP.isGranted) {
       var subscription = FlutterBluePlus.onScanResults.listen(
             (results) {
-              print('Print the results $results');
           if (results.isNotEmpty) {
-
-            print('result listened carefully');
             for (ScanResult result in results) {
-              print('Devices are scanning');
-              // if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
-              _addDeviceTolist(result.device);
-              // }
+              if (!_services.contains(result.device) &&
+                  result.device.advName.startsWith("BM")) {
+                _addDeviceTolist(result.device);
+              }
             }
           }
         },
-        onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-
-            content: Text(e.toString()),
-          ),
-        ),
+        onError: (e) =>
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(e.toString()),
+              ),
+            ),
       );
 
       FlutterBluePlus.cancelWhenScanComplete(subscription);
-
-      await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
-
+      await FlutterBluePlus.adapterState
+          .where((val) => val == BluetoothAdapterState.on)
+          .first;
       await FlutterBluePlus.startScan();
-
-      await FlutterBluePlus.isScanning.where((val) => val == false).first;
-
+      await FlutterBluePlus.isScanning
+          .where((val) => val == false)
+          .first;
       FlutterBluePlus.connectedDevices.map((device) {
         _addDeviceTolist(device);
       });
     }
-
   }
 
   @override
@@ -107,11 +97,11 @@ class QueryPageState extends State<QueryPage> {
       } else if (status.isGranted || status.isLimited) {
         _initBluetooth();
       }
-
       if (await Permission.location.status.isPermanentlyDenied) {
         openAppSettings();
       }
-    }();
+    }
+    ();
     super.initState();
   }
 
@@ -143,6 +133,7 @@ class QueryPageState extends State<QueryPage> {
         });
       }
 
+
       void _cancelDisconnectTimer(String deviceId) {
         if (disconnectTimers[deviceId] != null) {
           disconnectTimers[deviceId]!.cancel();
@@ -156,19 +147,15 @@ class QueryPageState extends State<QueryPage> {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    Text(device.platformName == '' ? '(unknown device)' : device.advName),
+                    Text(device.platformName == '' ? '(unknown device)' : device
+                        .advName),
                     Text(device.remoteId.toString()),
                   ],
                 ),
               ),
               TextButton(
-                child: Text(
-                  isDeviceConnected
-                      ? 'Connected'
-                      : 'Connect',
-                  style: TextStyle(color: Colors.black),
-                ),
                 onPressed: () async {
+                  // deviceConnectionStatus[deviceId] == true ? null : () => _toggleConnection(deviceId);
                   FlutterBluePlus.stopScan();
                   try {
                     // await device.connect();
@@ -185,13 +172,20 @@ class QueryPageState extends State<QueryPage> {
                   }
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                      states) {
                     if (isDeviceConnected) {
-                      return Colors.green;
-                    } else {
                       return Colors.grey;
+                    } else {
+                      return Colors.green;
                     }
                   }),
+                ),
+                child: Text(
+                  isDeviceConnected == true
+                      ? 'Connect'
+                      : 'Connected',
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
 
@@ -209,7 +203,8 @@ class QueryPageState extends State<QueryPage> {
     );
   }
 
-  List<ButtonTheme> _buildReadWriteNotifyButton(BluetoothCharacteristic characteristic) {
+  List<ButtonTheme> _buildReadWriteNotifyButton(
+      BluetoothCharacteristic characteristic) {
     List<ButtonTheme> buttons = <ButtonTheme>[];
 
     if (characteristic.properties.read) {
@@ -263,7 +258,8 @@ class QueryPageState extends State<QueryPage> {
                           TextButton(
                             child: const Text("Send"),
                             onPressed: () {
-                              characteristic.write(utf8.encode(_writeController.value.text));
+                              characteristic.write(
+                                  utf8.encode(_writeController.value.text));
                               Navigator.pop(context);
                             },
                           ),
@@ -290,7 +286,8 @@ class QueryPageState extends State<QueryPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ElevatedButton(
-              child: const Text('NOTIFY', style: TextStyle(color: Colors.black)),
+              child: const Text(
+                  'NOTIFY', style: TextStyle(color: Colors.black)),
               onPressed: () async {
                 characteristic.lastValueStream.listen((value) {
                   setState(() {
@@ -322,7 +319,8 @@ class QueryPageState extends State<QueryPage> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text(characteristic.uuid.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(characteristic.uuid.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Row(
@@ -332,7 +330,8 @@ class QueryPageState extends State<QueryPage> {
                 ),
                 Row(
                   children: <Widget>[
-                    Expanded(child: Text('Value: ${readValues[characteristic.uuid]}')),
+                    Expanded(child: Text(
+                        'Value: ${readValues[characteristic.uuid]}')),
                   ],
                 ),
                 const Divider(),
@@ -342,7 +341,8 @@ class QueryPageState extends State<QueryPage> {
         );
       }
       containers.add(
-        ExpansionTile(title: Text(service.uuid.toString()), children: characteristicsWidget),
+        ExpansionTile(title: Text(service.uuid.toString()),
+            children: characteristicsWidget),
       );
     }
 
@@ -362,10 +362,11 @@ class QueryPageState extends State<QueryPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(widget.title),
-    ),
-    body: _buildView(),
-  );
+  Widget build(BuildContext context) =>
+      Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: _buildView(),
+      );
 }

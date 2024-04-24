@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,7 +15,6 @@ class AutoQueryPage extends StatefulWidget {
 }
 
 class AutoQueryPageState extends State<AutoQueryPage> {
-  bool isConnected = false;
   final _writeController = TextEditingController();
   BluetoothDevice? _connectedDevice;
   final List<BluetoothService> _services = [];
@@ -27,27 +24,11 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   FlutterTts flutterTts = FlutterTts();
   bool isDeviceConnected = true;
 
-
-  void toggleConnection() {
-    setState(() {
-      isConnected = !isConnected;
-    });
-  }
-
-  void _addDeviceTolist(final BluetoothDevice device) {
+  Future<void> _addDeviceTolist(final BluetoothDevice device) async {
+    print("checker ${device.platformName}");
     if (!devicesList.contains(device)) {
       setState(() {
         devicesList.add(device);
-      });
-    }
-  }
-
-  void disconnectDevice() async {
-    if (_connectedDevice != null) {
-      await _connectedDevice!.disconnect();
-      setState(() {
-        _connectedDevice = null;
-        _services.clear();
       });
     }
   }
@@ -57,47 +38,50 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     var scanP = await Permission.bluetoothScan.request();
     var connectP = await Permission.bluetoothConnect.request();
 
-    print('Permissions are granting');
-
-    if(scanP.isGranted && connectP.isGranted){
-
-      print('Permission Granted');
-
+    if (scanP.isGranted && connectP.isGranted) {
       var subscription = FlutterBluePlus.onScanResults.listen(
             (results) {
-          print('Print the results $results');
           if (results.isNotEmpty) {
-
-            print('result listened carefully');
             for (ScanResult result in results) {
-              print('Devices are scanning');
-              // if (!_services.contains(result.device) && result.device.advName.startsWith("BM")) {
-              _addDeviceTolist(result.device);
-              // }
+              if (!_services.contains(result.device) &&
+                  result.device.advName.startsWith("BM")) {
+                _addDeviceTolist(result.device);
+              }
+              _speakDeviceNameSequentially();
             }
           }
         },
-        onError: (e) => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-
-            content: Text(e.toString()),
-          ),
-        ),
+        onError: (e) =>
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(e.toString()),
+              ),
+            ),
       );
 
       FlutterBluePlus.cancelWhenScanComplete(subscription);
 
-      await FlutterBluePlus.adapterState.where((val) => val == BluetoothAdapterState.on).first;
+      await FlutterBluePlus.adapterState
+          .where((val) => val == BluetoothAdapterState.on)
+          .first;
 
       await FlutterBluePlus.startScan();
 
-      await FlutterBluePlus.isScanning.where((val) => val == false).first;
+      await FlutterBluePlus.isScanning
+          .where((val) => val == false)
+          .first;
 
-      FlutterBluePlus.connectedDevices.map((device) {
-        _addDeviceTolist(device);
+      FlutterBluePlus.connectedDevices.map((device) async {
+        await _addDeviceTolist(device);
       });
     }
+  }
 
+  void _speakDeviceNameSequentially() async {
+    for (BluetoothDevice device in devicesList) {
+      _speakDeviceName(device.platformName);
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
 
   @override
@@ -116,33 +100,19 @@ class AutoQueryPageState extends State<AutoQueryPage> {
       if (await Permission.location.status.isPermanentlyDenied) {
         openAppSettings();
       }
-    }();
+    }
+    ();
     super.initState();
+  }
+
+  void _speakDeviceName(String name) async {
+    await flutterTts.speak(name);
+    await flutterTts.awaitSpeakCompletion(true);
   }
 
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
     for (BluetoothDevice device in devicesList) {
-      String deviceId = device.id.toString();
-
-
-      void _startDisconnectTimer(String deviceId) {
-        disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () async {
-          // Disconnect the device after 2 seconds
-          await device.disconnect();
-          setState(() {
-            isDeviceConnected = !isDeviceConnected;
-          });
-        });
-      }
-
-      void _cancelDisconnectTimer(String deviceId) {
-        if (disconnectTimers[deviceId] != null) {
-          disconnectTimers[deviceId]!.cancel();
-        }
-      }
-
-
       containers.add(
         SizedBox(
           height: 50,
@@ -151,7 +121,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    Text(device.platformName == '' ? '(unknown device)' : device.advName),
+                    Text(device.platformName == '' ? '(unknown device)' : device
+                        .advName),
                     Text(device.remoteId.toString()),
                   ],
                 ),
@@ -170,7 +141,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     );
   }
 
-  List<ButtonTheme> _buildReadWriteNotifyButton(BluetoothCharacteristic characteristic) {
+  List<ButtonTheme> _buildReadWriteNotifyButton(
+      BluetoothCharacteristic characteristic) {
     List<ButtonTheme> buttons = <ButtonTheme>[];
 
     if (characteristic.properties.read) {
@@ -224,7 +196,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
                         TextButton(
                           child: const Text("Send"),
                           onPressed: () {
-                            characteristic.write(utf8.encode(_writeController.value.text));
+                            characteristic.write(
+                                utf8.encode(_writeController.value.text));
                             Navigator.pop(context);
                           },
                         ),
@@ -252,7 +225,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ElevatedButton(
-              child: const Text('NOTIFY', style: TextStyle(color: Colors.black)),
+              child: const Text(
+                  'NOTIFY', style: TextStyle(color: Colors.black)),
               onPressed: () async {
                 characteristic.lastValueStream.listen((value) {
                   setState(() {
@@ -284,7 +258,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text(characteristic.uuid.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(characteristic.uuid.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Row(
@@ -294,7 +269,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
                 ),
                 Row(
                   children: <Widget>[
-                    Expanded(child: Text('Value: ${readValues[characteristic.uuid]}')),
+                    Expanded(child: Text(
+                        'Value: ${readValues[characteristic.uuid]}')),
                   ],
                 ),
                 const Divider(),
@@ -304,7 +280,8 @@ class AutoQueryPageState extends State<AutoQueryPage> {
         );
       }
       containers.add(
-        ExpansionTile(title: Text(service.uuid.toString()), children: characteristicsWidget),
+        ExpansionTile(title: Text(service.uuid.toString()),
+            children: characteristicsWidget),
       );
     }
 
@@ -316,6 +293,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     );
   }
 
+
   ListView _buildView() {
     if (_connectedDevice != null) {
       return _buildConnectDeviceView();
@@ -324,10 +302,11 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(widget.title),
-    ),
-    body: _buildView(),
-  );
+  Widget build(BuildContext context) =>
+      Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: _buildView(),
+      );
 }

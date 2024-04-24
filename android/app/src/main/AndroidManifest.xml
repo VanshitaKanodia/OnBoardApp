@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application
-        android:label="iwayplus_bluetooth"
+        android:label="OnBoard_iwayplus"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

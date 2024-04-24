@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 
 class FavouritePage extends StatefulWidget {
@@ -8,6 +9,7 @@ class FavouritePage extends StatefulWidget {
 
 class _FavouritePageState extends State<FavouritePage> {
   List<BusInfo> busList = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,15 @@ class _FavouritePageState extends State<FavouritePage> {
           return ListTile(
             title: Text('Bus Number: ${busList[index].busNumber}'),
             subtitle: Text('Route: ${busList[index].route}'),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              //Call aa method to delete the device from the list
+              onPressed: (){
+                setState(() {
+                  busList.remove(busList[index]);
+                });
+              },
+            ),
           );
         },
       ),
@@ -32,6 +43,7 @@ class _FavouritePageState extends State<FavouritePage> {
       ),
     );
   }
+
 
   void _showBusInfoDialog(BuildContext context) async {
     String? busNumber;

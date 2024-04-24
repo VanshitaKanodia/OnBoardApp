@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isSwitched = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   bool isQueryEnabled = false;
   bool isAutoQueryEnabled = false;
   bool isFavouriteModeEnabled = false;
@@ -45,13 +45,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _toggleSwitch(bool value) {
-    setState(() {
-      isSwitched = value;
-    });
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +59,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       TextFormField(
                         controller: _searchController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Search',
                           hintText: 'Enter your search query',
                           prefixIcon: Icon(Icons.search),
@@ -76,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                           // Perform search based on the entered query
                         },
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -87,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
                             } : null,
                             child:
-                                Text('Query'),
+                                const Text('Query'),
                           ),
                           Switch(
                                   value: isQueryEnabled,
@@ -106,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => AutoQueryPage(title: "Autoquery")));
                             } : null,
                             child:
-                            Text('Auto-Query'),
+                            const Text('Auto-Query'),
                           ),
                           Switch(
                             value: isAutoQueryEnabled,
@@ -125,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => FavouritePage()));
                             }: null,
                             child:
-                            Text('Favourite Mode'),
+                            const Text('Favourite Mode'),
                           ),
                           Switch(
                             value: isFavouriteModeEnabled,
