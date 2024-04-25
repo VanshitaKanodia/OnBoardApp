@@ -11,6 +11,24 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        leading: Icon(Icons.arrow_back_ios),
+      ),
+      body: SafeArea(
+        child: Container(
+          child: Text(
+            'Welcome back.',
+            style: TextStyle(
+              color: Color(0xFF090A0A),
+              fontSize: 16,
+              fontFamily: 'Open Sans',
+              fontWeight: FontWeight.w400,
+              height: 0.06,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
