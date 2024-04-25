@@ -19,6 +19,7 @@ class InitPage extends StatelessWidget {
           GestureDetector(
               onTap: () {
                 print('Tapped');
+                Navigator.pushNamed(context, '/signIn_page');
               },
               child: Column(
                   children: [
