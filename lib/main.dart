@@ -22,7 +22,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:iwayplus_bluetooth/views/home_page.dart';
+import 'package:iwayplus_bluetooth/auth_page/Init_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HomePage(),
+        home: InitPage(),
 
       );
 }
