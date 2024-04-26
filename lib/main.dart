@@ -1,26 +1,3 @@
-
-// import 'package:flutter/material.dart';
-// import 'package:iwayplus_bluetooth/views/home_page.dart';
-//
-// void main() {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   runApp(MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Bluetooth Scanner',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: HomePage(),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:iwayplus_bluetooth/auth_page/Init_page.dart';
 import 'package:iwayplus_bluetooth/auth_page/otp_screen.dart';
@@ -44,7 +21,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: 'init_page',
+        initialRoute: 'home_page',
         routes: {
           'init_page' : (context) => InitPage(),
           'signIn_page' : (context) => SignInPage(),
@@ -53,6 +30,5 @@ class MyApp extends StatelessWidget {
           'home_page': (context) => HomePage(),
         },
         home: SignInPage(),
-
       );
 }

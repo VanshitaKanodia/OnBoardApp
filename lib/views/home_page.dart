@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:iwayplus_bluetooth/views/Favourite.dart';
+import 'package:iwayplus_bluetooth/auth_page/signup_page.dart';
 import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/query.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +12,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isSwitched = false;
-  final TextEditingController _searchController = TextEditingController();
   bool isQueryEnabled = false;
   bool isAutoQueryEnabled = false;
   bool isFavouriteModeEnabled = false;
@@ -34,9 +32,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
-
-
   void _toggleFavouriteMode(bool value) {
     setState(() {
       isFavouriteModeEnabled = value;
@@ -45,95 +40,44 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  int currentPageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        controller: _searchController,
-                        decoration: const InputDecoration(
-                          labelText: 'Search',
-                          hintText: 'Enter your search query',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          // Perform search based on the entered query
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                          ElevatedButton(
-                            onPressed: isQueryEnabled ?
-                                () {
-                              // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => QueryPage(title: 'Query Scanner')));
-                            } : null,
-                            child:
-                                const Text('Query'),
-                          ),
-                          Switch(
-                                  value: isQueryEnabled,
-                                  onChanged: _toggleQuery,
-                                  activeTrackColor: Colors.lightGreenAccent,
-                                  activeColor: Colors.green,
-                                ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: isAutoQueryEnabled ? () {
-                              // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AutoQueryPage(title: "Autoquery")));
-                            } : null,
-                            child:
-                            const Text('Auto-Query'),
-                          ),
-                          Switch(
-                            value: isAutoQueryEnabled,
-                            onChanged: _toggleAutoQuery,
-                            activeTrackColor: Colors.lightGreenAccent,
-                            activeColor: Colors.green,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: isFavouriteModeEnabled ? () {
-                              // Handle button 1 action
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => FavouritePage()));
-                            }: null,
-                            child:
-                            const Text('Favourite Mode'),
-                          ),
-                          Switch(
-                            value: isFavouriteModeEnabled,
-                            onChanged: _toggleFavouriteMode,
-                            activeTrackColor: Colors.lightGreenAccent,
-                            activeColor: Colors.green,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-        )
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        selectedIndex: currentPageIndex,
+        destinations: <Widget>[
+          ElevatedButton(onPressed: (){
+            setState(() {
+              currentPageIndex = 0;
+            });
+          }, child: Text(currentPageIndex == 0 ? 'Query se' : 'Query'),
+          ),
+          ElevatedButton(onPressed: (){
+            setState(() {
+              currentPageIndex = 1;
+            });
+          }, child: Text(currentPageIndex == 1 ? 'Auto Qury s' : 'Auto uery'),
+          ),
+          ElevatedButton(onPressed: (){
+            setState(() {
+              currentPageIndex = 2;
+            });
+          }, child: Text(currentPageIndex == 2 ? 'My Routes' : 'unselected'),
+          ),
+        ],
+      ),
+      body: <Widget>[
+        QueryPage(title: 'Query'),
+        AutoQueryPage(title: 'Auto Query'),
+        SignupPage()
+      ][currentPageIndex],
     );
   }
 }
