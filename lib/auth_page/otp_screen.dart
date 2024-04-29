@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
@@ -11,12 +12,27 @@ class OtpPage extends StatefulWidget {
 }
 
 class _OtpPageState extends State<OtpPage> {
+
   OtpFieldController otpController = OtpFieldController();
+
   var code = "";
 
   // Assume expectedOTP is the OTP received from the server
-  String expectedOTP = "123456"; // Example OTP, replace it with your actual OTP
+  String expectedOTP = "654321"; // Example OTP, replace it with your actual OTP
+  void verifyOTP() {
+    String enteredOTP = otpController.toString();
 
+    if (enteredOTP == expectedOTP) {
+      // OTP verification successful
+      print("OTP verification successful");
+      // Proceed with login process
+      // Call your login function here or navigate to the next screen
+    } else {
+      // OTP verification failed
+      print("OTP verification failed");
+      // Show error message or handle accordingly
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +91,7 @@ class _OtpPageState extends State<OtpPage> {
                     },
                     onCompleted: (pin) {
                       print("Completed: " + pin);
+                      verifyOTP();
                     },
                   ),
 
@@ -92,17 +109,7 @@ class _OtpPageState extends State<OtpPage> {
                 // ),
                 GestureDetector(
                     onTap: () {
-                        String enteredOTP = otpController.toString();
-                        if (enteredOTP == expectedOTP) {
-                          // OTP verification successful
-                          print("OTP verification successful");
-                          // Proceed with login process
-                          // Call your login function here or navigate to the next screen
-                        } else {
-                          // OTP verification failed
-                          print("OTP verification failed");
-                          // Show error message or handle accordingly
-                        }
+                      verifyOTP();
                     },
                     child: Column(
                       children: [
