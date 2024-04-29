@@ -7,9 +7,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AutoQueryPage extends StatefulWidget {
-  AutoQueryPage({Key? key, required this.title}) : super(key: key);
+  AutoQueryPage({Key? key}) : super(key: key);
 
-  final String title;
 
   @override
   AutoQueryPageState createState() => AutoQueryPageState();
@@ -305,9 +304,6 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
         body: _buildView(),
       );
 }

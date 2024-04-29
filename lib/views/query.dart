@@ -8,9 +8,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class QueryPage extends StatefulWidget {
-  QueryPage({Key? key, required this.title}) : super(key: key);
+  QueryPage({Key? key}) : super(key: key);
 
-  final String title;
 
   @override
   QueryPageState createState() => QueryPageState();
@@ -111,6 +110,7 @@ class QueryPageState extends State<QueryPage> {
 
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
+    print(devicesList);
     for (BluetoothDevice device in devicesList) {
       String deviceId = device.id.toString();
 
@@ -139,60 +139,6 @@ class QueryPageState extends State<QueryPage> {
           disconnectTimers[deviceId]!.cancel();
         }
       }
-      containers.add(
-        SizedBox(
-          height: 50,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Text(device.platformName == '' ? '(unknown device)' : device
-                        .advName),
-                    Text(device.remoteId.toString()),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  // deviceConnectionStatus[deviceId] == true ? null : () => _toggleConnection(deviceId);
-                  FlutterBluePlus.stopScan();
-                  try {
-                    // await device.connect();
-                    _startConnecting(deviceId);
-                    if (isDeviceConnected) {
-                      _startDisconnectTimer(deviceId);
-                    }
-                  } on PlatformException catch (e) {
-                    if (e.code != 'already_connected') {
-                      rethrow;
-                    }
-                  } finally {
-                    _services = await device.discoverServices();
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                      states) {
-                    if (isDeviceConnected) {
-                      return Colors.grey;
-                    } else {
-                      return Colors.green;
-                    }
-                  }),
-                ),
-                child: Text(
-                  isDeviceConnected == true
-                      ? 'Connect'
-                      : 'Connected',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-
-            ],
-          ),
-        ),
-      );
     }
 
     return ListView(
@@ -307,7 +253,6 @@ class QueryPageState extends State<QueryPage> {
 
   ListView _buildConnectDeviceView() {
     List<Widget> containers = <Widget>[];
-
     for (BluetoothService service in _services) {
       List<Widget> characteristicsWidget = <Widget>[];
 
@@ -356,17 +301,16 @@ class QueryPageState extends State<QueryPage> {
 
   ListView _buildView() {
     if (_connectedDevice != null) {
-      return _buildConnectDeviceView();
+      return _buildConnectDeviceView();   //default
+      // return _buildListViewOfDevices();
     }
-    return _buildListViewOfDevices();
+    return _buildListViewOfDevices();     //default
+    // return _buildConnectDeviceView();
   }
 
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
         body: _buildView(),
       );
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:iwayplus_bluetooth/auth_page/Init_page.dart';
 import 'package:iwayplus_bluetooth/auth_page/otp_screen.dart';
-import 'package:iwayplus_bluetooth/auth_page/signIn_page.dart';
+import 'package:iwayplus_bluetooth/auth_page/logInPage.dart';
 import 'package:iwayplus_bluetooth/auth_page/signup_page.dart';
+import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/home_page.dart';
+import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
+import 'package:iwayplus_bluetooth/views/query.dart';
 
 
 void main() {
@@ -21,14 +24,17 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: 'home_page',
+        initialRoute: 'otp_page',
         routes: {
           'init_page' : (context) => InitPage(),
-          'signIn_page' : (context) => SignInPage(),
+          'logIn_page' : (context) => LogInPage(),
           'signUp_page' : (context) => SignupPage(),
           'otp_page' : (context) => OtpPage(),
           'home_page': (context) => HomePage(),
+          'query_page' : (context) => QueryPage(),
+          'auto_query_page' : (context) => AutoQueryPage(),
+          'myRoute_page': (context) => MyRoutes(),
         },
-        home: SignInPage(),
+        home: LogInPage(),
       );
 }

@@ -19,7 +19,7 @@ class InitPage extends StatelessWidget {
               GestureDetector(
                   onTap: () {
                     print('Tapped');
-                    Navigator.pushNamed(context, '/signIn_page');
+                    Navigator.pushNamed(context, 'logIn_page');
                   },
                   child: Column(
                     children: [
@@ -60,7 +60,9 @@ class InitPage extends StatelessWidget {
                               ),
                             ),
                             TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, 'signUp_screen');
+                                },
                                 child: Text('Sign up',
                                   style: TextStyle(
                                     color: Color(0xFF2563EB),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:pinput/pinput.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -20,20 +21,23 @@ class _OtpPageState extends State<OtpPage> {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(15.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const Text(
                 'Enter authentication code',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFF090A0A),
-                  fontSize: 16,
+                  fontSize: 24,
                   fontFamily: 'Open Sans',
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w700,
+                  height: 0.06,
                 ),
               ),
+              SizedBox(height: 20,),
               const Text(
                 'Enter the 4-digit code that we have sent via the phone number +91 1234567890',
                 style: TextStyle(
@@ -44,11 +48,12 @@ class _OtpPageState extends State<OtpPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: OtpTextField(
-                  borderRadius: const BorderRadius.all(Radius.circular(80)),
-                  fieldWidth: 60,
-                  numberOfFields: 4,
+                padding: EdgeInsets.symmetric(vertical: 40.0),
+                child:
+                OtpTextField(
+                  borderRadius: const BorderRadius.all(Radius.circular(280)),
+                  fieldWidth: 55,
+                  numberOfFields: 6,
                   borderColor: const Color(0xFF512DA8),
                   showFieldAsBox: true,
                   onCodeChanged: (String code) {},

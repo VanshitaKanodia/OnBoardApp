@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -13,6 +16,30 @@ class _SignupPageState extends State<SignupPage> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+
+  Future<void> signup(String name, String phoneNum) async {
+    try {
+      var response = await http.post(
+          Uri.parse('https://dev.iwayplus.in/auth/signup'),
+          body: {
+            'username' : phoneNum,
+            'name' : name,
+          });
+
+      if(response.statusCode == 200)
+      {
+        var data = jsonDecode(response.body);
+        print('Account created successfully:');
+        print(data);
+      }else
+      {
+        print('Failed to create account: ${response.statusCode}');
+        print(response.body);
+      }
+    } catch(e){
+      print('Error occurred while signing up: $e');
+    }
+  }
   bool isChecked = false;
   @override
   Widget build(BuildContext context) {
@@ -43,34 +70,36 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 32,),
                 SizedBox(
-                  width: 340,
+                  width: MediaQuery.sizeOf(context).width,
                   child: Container(
                     width: 327,
-                    height: 48,
+                    height: 50,
                     child: TextFormField(
                       controller: _nameController,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
-                        counterText: '',
-                        fillColor: const Color(0xFFDFDFDF),
+                        fillColor: const Color(0xFFE3E4E5),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                           borderSide: const BorderSide(color: Colors.black),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                           borderSide: const BorderSide(color: Colors.black),
                         ),
-                        hintText: 'First & Last Name',
-                        hintStyle: const TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.grey,
-                        ),
+                        // hintText: 'First & Last Name',
+                        // hintStyle: const TextStyle(
+                        //   fontSize: 16.0,
+                        //   color: Colors.grey,
+                        // ),
                         hintMaxLines: 1,
-                        labelText: 'Name',
+                        labelText: 'First & Last Name',
                         labelStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16.0,
+                            color: Color(0xFF72777A),
+                            fontSize: 16,
+                            fontFamily: 'Open Sans',
+                            fontWeight: FontWeight.w400,
+                            height: 0.06,
                         ),
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -83,34 +112,37 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 20,),
                 SizedBox(
-                  width: 340,
+                  width: MediaQuery.sizeOf(context).width,
                   child: Container(
                     width: 327,
-                    height: 48,
+                    height: 50,
                     child: TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                         counterText: '',
-                        fillColor: const Color(0xFFDFDFDF),
+                        fillColor: const Color(0xFFE3E4E5),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                           borderSide: const BorderSide(color: Colors.black),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
                           borderSide: const BorderSide(color: Colors.black),
                         ),
-                        hintText: 'Mobile Number',
+                        // hintText: 'Mobile Number',
                         hintStyle: const TextStyle(
                           fontSize: 16.0,
                           color: Colors.grey,
                         ),
                         hintMaxLines: 1,
                         labelText: 'Mobile Number',
-                        labelStyle: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16.0,
+                        labelStyle: TextStyle(
+                          color: Color(0xFF72777A),
+                          fontSize: 16,
+                          fontFamily: 'Open Sans',
+                          fontWeight: FontWeight.w400,
+                          height: 0.06,
                         ),
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -171,7 +203,9 @@ class _SignupPageState extends State<SignupPage> {
           Padding(
             padding: const EdgeInsets.all(50.0),
             child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  signup(_nameController.text.toString(), _phoneController.text.toString());
+                },
                 child: Container(
                   width: 327,
                   height: 48,
@@ -184,7 +218,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   child: const Center(
                     child: Text(
-                      'SignUp',
+                      'Sign Up',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
