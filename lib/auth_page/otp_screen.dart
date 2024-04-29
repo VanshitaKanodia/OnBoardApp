@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
-import 'package:pinput/pinput.dart';
+import 'package:otp_text_field/otp_text_field.dart';
+import 'package:otp_text_field/style.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -10,6 +10,7 @@ class OtpPage extends StatefulWidget {
 }
 
 class _OtpPageState extends State<OtpPage> {
+  OtpFieldController otpController = OtpFieldController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -21,7 +22,7 @@ class _OtpPageState extends State<OtpPage> {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: const EdgeInsets.only(top: 15, left: 10, right: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -47,21 +48,34 @@ class _OtpPageState extends State<OtpPage> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              Padding(
+              Container(
+                width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 40.0),
-                child:
-                OtpTextField(
-                  borderRadius: const BorderRadius.all(Radius.circular(280)),
-                  fieldWidth: 55,
-                  numberOfFields: 6,
-                  borderColor: const Color(0xFF512DA8),
-                  showFieldAsBox: true,
-                  onCodeChanged: (String code) {},
-                  onSubmit: (String verificationCode) {
-                    verificationCode = '';
-                  }, // end onSubmit
-                ),
+                child: OTPTextField(
+                    controller: otpController,
+                    length: 5,
+                    textFieldAlignment: MainAxisAlignment.spaceAround,
+                    fieldWidth: 20,
+                    fieldStyle: FieldStyle.underline,
+                    style: TextStyle(fontSize: 17),
+                    onChanged: (pin) {
+                      print("Changed: " + pin);
+                    },
+                    onCompleted: (pin) {
+                      print("Completed: " + pin);
+                    }),
               ),
+                // OtpTextField(
+                //   // borderRadius: const BorderRadius.all(Radius.circular(280)),
+                //   fieldWidth: 55,
+                //   numberOfFields: 6,
+                //   borderColor: const Color(0xFF512DA8),
+                //   showFieldAsBox: true,
+                //   onCodeChanged: (String code) {},
+                //   onSubmit: (String verificationCode) {
+                //     verificationCode = '';
+                //   }, // end onSubmit
+                // ),
               GestureDetector(
                   onTap: () {},
                   child: Column(
@@ -107,7 +121,7 @@ class _OtpPageState extends State<OtpPage> {
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }
