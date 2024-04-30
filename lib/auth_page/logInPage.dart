@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 class LogInPage extends StatefulWidget {
 
+
   @override
   State<LogInPage> createState() => _LogInPageState();
 }
@@ -25,6 +26,7 @@ class _LogInPageState extends State<LogInPage> {
       if(response.statusCode == 200)
         {
           print('+++++ OTP sent successfully +++++');
+          Navigator.pushNamed(context, 'otp_page');
         } else
           {
             print('+++ Failed to send OTP: ${response.statusCode} +++');
