@@ -372,69 +372,80 @@ class QueryPageState extends State<QueryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: devicesList.length,
-        itemBuilder: (context, index) {
-          BluetoothDevice device = devicesList[index];
-          String deviceId = device.id.toString();
-          return Card(
-            color: Color(0xFFE3E4E5),
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(device.platformName == '' ? '(unknown device)' : device.advName,
-                        style: TextStyle(
-                          color: Color(0xFF72777A),
-                          fontSize: 14,
-                          fontFamily: 'Open Sans',
-                          fontWeight: FontWeight.w600,
-                          height: 0.08,
-                        ),),
-                      Row(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ListView.builder(
+              itemCount: devicesList.length,
+              itemBuilder: (context, index) {
+                BluetoothDevice device = devicesList[index];
+                String deviceId = device.id.toString();
+                return InkWell(
+                  onTap: (){
+                    _buildView();
+                  },
+                  child: Card(
+                    color: Color(0xFFE3E4E5),
+                    margin: EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.share_outlined,
-                              color: Colors.grey[700],),
-                            color: Colors.grey,),
-                          IconButton(
-                            icon: Icon(
-                              isFavoriteList[index]
-                                  ? Icons.favorite_outlined
-                                  : Icons.favorite_outline_rounded,
-                              color: isFavoriteList[index] ? Colors
-                                  .grey[700] : null,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                isFavoriteList[index] =
-                                !isFavoriteList[index]; // Toggle favorite state
-                              });
-                            },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(device.platformName == '' ? '(unknown device)' : device.advName,
+                                style: TextStyle(
+                                  color: Color(0xFF72777A),
+                                  fontSize: 14,
+                                  fontFamily: 'Open Sans',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0.08,
+                                ),),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.share_outlined,
+                                      color: Colors.grey[700],),
+                                    color: Colors.grey,),
+                                  IconButton(
+                                    icon: Icon(
+                                      isFavoriteList[index]
+                                          ? Icons.favorite_outlined
+                                          : Icons.favorite_outline_rounded,
+                                      color: isFavoriteList[index] ? Colors
+                                          .grey[700] : null,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        isFavoriteList[index] =
+                                        !isFavoriteList[index]; // Toggle favorite state
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 25,),
+                          Text(device.remoteId.id,
+                            style: TextStyle(
+                              color: Color(0xFF72777A),
+                              fontSize: 10,
+                              fontFamily: 'Open Sans',
+                              fontWeight: FontWeight.w400,
+                              height: 0.16,
+                            ),)
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 25,),
-                  Text(device.remoteId.id,
-                    style: TextStyle(
-                      color: Color(0xFF72777A),
-                      fontSize: 10,
-                      fontFamily: 'Open Sans',
-                      fontWeight: FontWeight.w400,
-                      height: 0.16,
-                    ),)
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
