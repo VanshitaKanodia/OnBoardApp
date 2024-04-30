@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
-import 'package:pinput/pinput.dart';
+import 'package:http/http.dart' as http;
 
 class OtpPage extends StatefulWidget {
-  const OtpPage({super.key});
+  const OtpPage({super.key, required this.phoneNum});
+  final String phoneNum;
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -13,25 +16,56 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
 
-  OtpFieldController otpController = OtpFieldController();
-
-  var code = "";
+  OtpFieldController _otpController = OtpFieldController();
 
   // Assume expectedOTP is the OTP received from the server
-  String expectedOTP = "654321"; // Example OTP, replace it with your actual OTP
-  void verifyOTP() {
-    String enteredOTP = otpController.toString();
 
-    if (enteredOTP == expectedOTP) {
-      // OTP verification successful
-      print("OTP verification successful");
-      // Proceed with login process
-      // Call your login function here or navigate to the next screen
-    } else {
-      // OTP verification failed
-      print("OTP verification failed");
-      // Show error message or handle accordingly
+  void verifyOTP(String otp) async {
+    // try{
+    //  var response = await http.post(Uri.parse('https://dev.iwayplus.in/auth/otp/token'),
+    //  body: {
+    //    'username' : widget.phoneNum,
+    //    'otp' : otp.toString(),
+    //  });
+    //  if(response.statusCode == 200) {
+    //    Navigator.pushNamed(context, 'home_page');
+    //  }
+    //  else
+    //    {
+    //      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //          content: Text('OTP Verification failed. Please try again'),
+    //      ));
+    //    }
+
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('https://dev.iwayplus.in/auth/otp/token'));
+    request.body = json.encode({
+      'username': '+919729391756',
+      'otp': otp
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('-----OTP Verified Successfully------');
+         print(await response.stream.bytesToString());
     }
+    else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('OTP Verification failed. Please try again'),
+          ));
+      print('---------otp failed $response.reasonPhrase');
+    }
+
+
+    // }
+    // catch (e){
+    //   print('Error Occured while Verify OTP====: $e');
+    // }
   }
 
   @override
@@ -39,7 +73,13 @@ class _OtpPageState extends State<OtpPage> {
     return SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            leading: const Icon(Icons.arrow_back_ios),
+            leading: Builder(
+              builder: (BuildContext Context){
+                return IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () { Navigator.pop(context); },);
+              },
+            ),
             actions: [
               TextButton(onPressed: () {}, child: const Text('Change Number'))
             ],
@@ -78,23 +118,21 @@ class _OtpPageState extends State<OtpPage> {
                       .width,
                   padding: EdgeInsets.symmetric(vertical: 40.0),
                   child: OTPTextField(
-                    controller: otpController,
+                    controller: _otpController,
                     length: 6,
-                    // Set the length to 6 digits
+                        // Set the length to 6 digits
                     textFieldAlignment: MainAxisAlignment.spaceAround,
                     fieldWidth: 30,
                     // Increase the field width to accommodate 6 digits
                     fieldStyle: FieldStyle.underline,
                     style: TextStyle(fontSize: 17),
                     onChanged: (pin) {
-                      print("Changed: " + pin);
+                      print("=====Changed======: " + pin);
                     },
                     onCompleted: (pin) {
-                      print("Completed: " + pin);
-                      verifyOTP();
+                      print("------Completed-----: " + pin);
                     },
                   ),
-
                 ),
                 // OtpTextField(
                 //   // borderRadius: const BorderRadius.all(Radius.circular(280)),
@@ -108,8 +146,10 @@ class _OtpPageState extends State<OtpPage> {
                 //   }, // end onSubmit
                 // ),
                 GestureDetector(
-                    onTap: () {
-                      verifyOTP();
+                    onTap: () async {
+                      String enteredOTP = _otpController.toString();
+                      verifyOTP(enteredOTP);
+                      await Navigator.pushNamed(context, 'home_page');
                     },
                     child: Column(
                       children: [

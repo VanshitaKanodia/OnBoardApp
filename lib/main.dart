@@ -24,12 +24,12 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: 'logIn_page',
+        initialRoute: 'home_page',
         routes: {
           'init_page' : (context) => InitPage(),
           'logIn_page' : (context) => LogInPage(),
           'signUp_page' : (context) => SignupPage(),
-          'otp_page' : (context) => OtpPage(),
+          'otp_page' : (context) => OtpPage(phoneNum: '',),
           'home_page': (context) => HomePage(),
           'query_page' : (context) => QueryPage(),
           'auto_query_page' : (context) => AutoQueryPage(),

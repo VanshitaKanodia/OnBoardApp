@@ -42,11 +42,11 @@ class _HomePageState extends State<HomePage> {
 
   int _currentPageIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Query Screen'),
-    Text('Auto Query Screen'),
-    Text('My Route Screen'),
-  ];
+  // static const List<Widget> _widgetOptions = <Widget>[
+  //   Text('Query Screen'),
+  //   Text('Auto Query Screen'),
+  //   Text('My Route Screen'),
+  // ];
 
   final List<String> devicesList = [];
 

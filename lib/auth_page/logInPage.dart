@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,24 +19,32 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController countryCode = TextEditingController();
   TextEditingController authPhoneNumber = TextEditingController();
 
-  void login(String userPhoneNum) async {
-    try {
-      var response = await http.post(
-          Uri.parse('https://dev.iwayplus.in/auth/otp/send'),
-          body: {'username' : userPhoneNum});
+  Future<void> login(String userPhoneNum) async {
+   try {
+      var headers = {
+        'Content-Type': 'application/json'
+      };
+      var request = await http.Request('POST', Uri.parse('https://dev.iwayplus.in/auth/otp/send'));
+      request.body = json.encode({
+        "username": '+919729391756'
+      });
 
-      if(response.statusCode == 200)
-        {
-          print('+++++ OTP sent successfully +++++');
-          Navigator.pushNamed(context, 'otp_page');
-        } else
-          {
-            print('+++ Failed to send OTP: ${response.statusCode} +++');
-            print(response.body);
-          }
-    } catch(e){
-      print('Error occurred while sending OTP: $e');
-    }
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+      print(response);
+
+      if (response.statusCode == 200) {
+        print('=====----Account Logged In Successfully---=======');
+        Navigator.push(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNum: '${userPhoneNum}')));
+        print(response.request);
+      }
+      else {
+        print(response.reasonPhrase);
+      }
+   } catch(e){
+     print('-----Error occurred while sending OTP---:-> $e');
+   }
   }
  // Default country code
   @override
@@ -53,7 +63,7 @@ class _LogInPageState extends State<LogInPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => OtpPage()));
+            // Navigator.push(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNum: )));
           },
         ),
       ),
@@ -257,12 +267,6 @@ class _LogInPageState extends State<LogInPage> {
                 overflow: TextOverflow.ellipsis, // Specify how overflowing text should be handled
               ),
             ),
-            // GestureDetector(
-            //     onTap: () {
-            //       print('-------Log In Tapped-------');
-            //       login(authPhoneNumber.text.toString());
-            //       print('-------Log In success-------');
-            //     },
                 Column(
                   children: [
                     ElevatedButton(
@@ -270,8 +274,11 @@ class _LogInPageState extends State<LogInPage> {
                           // Construct complete phone number with country code
                           String completePhoneNumber = '${countrycode != null ? countrycode!.dialCode : (countryCode.text + authPhoneNumber.text)}';
                           // Call login function with complete phone number
-                          print(phone);
-                          login(completePhoneNumber + phone);
+                          print(completePhoneNumber + phone);
+                          login((completePhoneNumber + phone)).then((value) =>
+                          {
+                            print("func completed"),
+                          });
                         },
                         child: Container(
                       width: 327,

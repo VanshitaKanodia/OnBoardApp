@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -359,10 +360,138 @@ class QueryPageState extends State<QueryPage> {
     return _buildListViewOfDevices();
   }
 
+  // @override
+  // Widget build(BuildContext context) =>
+  //     Scaffold(
+  //       backgroundColor: Colors.white,
+  //       body: _buildView(),
+  //     );
+
+  List<bool> isFavoriteList = [false];
+
   @override
-  Widget build(BuildContext context) =>
-      Scaffold(
-        backgroundColor: Colors.white,
-        body: _buildView(),
-      );
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: devicesList.length,
+        itemBuilder: (context, index) {
+          BluetoothDevice device = devicesList[index];
+          String deviceId = device.id.toString();
+          return Card(
+            color: Color(0xFFE3E4E5),
+            margin: EdgeInsets.all(8.0),
+            child: ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(device.platformName == '' ? '(unknown device)' : device.advName,
+                        style: TextStyle(
+                          color: Color(0xFF72777A),
+                          fontSize: 14,
+                          fontFamily: 'Open Sans',
+                          fontWeight: FontWeight.w600,
+                          height: 0.08,
+                        ),),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.share_outlined,
+                              color: Colors.grey[700],),
+                            color: Colors.grey,),
+                          IconButton(
+                            icon: Icon(
+                              isFavoriteList[index]
+                                  ? Icons.favorite_outlined
+                                  : Icons.favorite_outline_rounded,
+                              color: isFavoriteList[index] ? Colors
+                                  .grey[700] : null,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isFavoriteList[index] =
+                                !isFavoriteList[index]; // Toggle favorite state
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 25,),
+                  Text(device.remoteId.id,
+                    style: TextStyle(
+                      color: Color(0xFF72777A),
+                      fontSize: 10,
+                      fontFamily: 'Open Sans',
+                      fontWeight: FontWeight.w400,
+                      height: 0.16,
+                    ),)
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
+
+
+
+// import 'package:flutter/material.dart';
+//
+// class QueryPage extends StatefulWidget {
+//   @override
+//   _QueryPageState createState() => _QueryPageState();
+// }
+//
+// class _QueryPageState extends State<QueryPage> {
+//   List<bool> isFavoriteList = [false, false, false]; // Initial favorite state for each card
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: ListView.builder(
+//         itemCount: 3, // Number of cards in the list
+//         itemBuilder: (context, index) {
+//           return Card(
+//             margin: EdgeInsets.all(8.0),
+//             child: ListTile(
+//               title: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Text("Item ${index + 1}"),
+//                       IconButton(
+//                         icon: Icon(
+//                           isFavoriteList[index]
+//                               ? Icons.favorite
+//                               : Icons.favorite_border,
+//                           color: isFavoriteList[index] ? Colors.red : null,
+//                         ),
+//                         onPressed: () {
+//                           setState(() {
+//                             isFavoriteList[index] =
+//                             !isFavoriteList[index]; // Toggle favorite state
+//                           });
+//                         },
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(height: 8.0),
+//                   Text("Description of Item ${index + 1}"),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
