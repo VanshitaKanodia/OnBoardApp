@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
 import 'package:iwayplus_bluetooth/views/query.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,12 +43,6 @@ class _HomePageState extends State<HomePage> {
 
   int _currentPageIndex = 0;
 
-  // static const List<Widget> _widgetOptions = <Widget>[
-  //   Text('Query Screen'),
-  //   Text('Auto Query Screen'),
-  //   Text('My Route Screen'),
-  // ];
-
   final List<String> devicesList = [];
 
 
@@ -58,12 +53,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  //
-  // final pages = [
-  //   QueryPage(title: 'Query Page'),
-  //   AutoQueryPage(title: 'Auto Query'),
-  //   MyRoutes(),
-  // ];
+
+  String navTitle = "";
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               Text(
-                'Query',
+                _currentPageIndex == 0 ? 'Query' : (_currentPageIndex == 1 ? 'Auto Query' : 'Favourites'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFF72777A),
@@ -92,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                   fontFamily: 'Open Sans',
                   fontWeight: FontWeight.w600,
                   height: 0.05,
-                ),
+                )
               ),
               Row(
                 children: [
@@ -170,122 +161,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              // Spacer(),
-
-
-              // Padding(
-              //   padding: const EdgeInsets.all(10.0),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //     children: [
-              //       GestureDetector(
-              //         onTap: () {
-              //           // Implement screen 1 navigation functionality here
-              //           print('---------Query tapped------');
-              //         },
-              //         child: Container(
-              //           width: 110,
-              //           height: 48,
-              //           padding: const EdgeInsets.all(10),
-              //           decoration: ShapeDecoration(
-              //             color: Color(0x7FD4D4D4),
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //           child: Column(
-              //             mainAxisSize: MainAxisSize.min,
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             crossAxisAlignment: CrossAxisAlignment.center,
-              //             children: [
-              //               Text(
-              //                 'Query',
-              //                 style: TextStyle(
-              //                   color: Color(0x993C3C43),
-              //                   fontSize: 14,
-              //                   fontFamily: 'Open Sans',
-              //                   fontWeight: FontWeight.w600,
-              //                   height: 0.08,
-              //                   letterSpacing: 0.14,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //       GestureDetector(
-              //         onTap: () {
-              //           // Implement screen 2 navigation functionality here
-              //           print('-----Auto query tapped------');
-              //         },
-              //         child: Container(
-              //           width: 110,
-              //           height: 48,
-              //           padding: const EdgeInsets.all(10),
-              //           decoration: ShapeDecoration(
-              //             color: Color(0x7FD4D4D4),
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //           child: Column(
-              //             // mainAxisSize: MainAxisSize.min,
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             crossAxisAlignment: CrossAxisAlignment.center,
-              //             children: [
-              //               Text(
-              //                 'Auto Query',
-              //                 style: TextStyle(
-              //                   color: Color(0x993C3C43),
-              //                   fontSize: 14,
-              //                   fontFamily: 'Open Sans',
-              //                   fontWeight: FontWeight.w600,
-              //                   height: 0.08,
-              //                   letterSpacing: 0.14,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //       GestureDetector(
-              //         onTap: () {
-              //           // Implement screen 3 navigation functionality here
-              //           print('-------My Route tapped--------');
-              //         },
-              //         child: Container(
-              //           width: 110,
-              //           height: 48,
-              //           padding: const EdgeInsets.all(10),
-              //           decoration: ShapeDecoration(
-              //             color: Color(0x7FD4D4D4),
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //           child: Column(
-              //             // mainAxisSize: MainAxisSize.min,
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             crossAxisAlignment: CrossAxisAlignment.center,
-              //             children: [
-              //               Text(
-              //                 'Favourites',
-              //                 style: TextStyle(
-              //                   color: Color(0x993C3C43),
-              //                   fontSize: 14,
-              //                   fontFamily: 'Open Sans',
-              //                   fontWeight: FontWeight.w600,
-              //                   height: 0.08,
-              //                   letterSpacing: 0.14,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
               Expanded(
                 child: _buildBody()
               ),
@@ -356,7 +231,6 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 14,
                 fontFamily: 'Open Sans',
                 fontWeight: FontWeight.w600,
-                height: 0.08,
                 letterSpacing: 0.14,
               ),
             ),
@@ -366,7 +240,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBody() {
+
+   Widget _buildBody() {
     switch (_currentPageIndex) {
       case 0:
         return QueryPage();

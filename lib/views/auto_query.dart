@@ -23,18 +23,48 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   Map<String, Timer?> disconnectTimers = {};
   FlutterTts flutterTts = FlutterTts();
   bool isDeviceConnected = true;
+  Timer? _speakTimer;
 
   Future<void> _addDeviceTolist(final BluetoothDevice device) async {
-    print("checker ${device.platformName}");
+    print("checker-------->>>> ${device.platformName}");
     if (!devicesList.contains(device)) {
       setState(() {
         devicesList.add(device);
+        startDeviceSpeakTimer();
       });
     }
   }
 
 
-  _initBluetooth() async {
+  @override
+  void initState() {
+    () async {
+      var status = await Permission.location.status;
+      if (status.isDenied) {
+        final status = await Permission.location.request();
+        if (status.isGranted || status.isLimited) {
+          _initBluetooth();
+        }
+      } else if (status.isGranted || status.isLimited) {
+        _initBluetooth();
+      }
+
+      if (await Permission.location.status.isPermanentlyDenied) {
+        openAppSettings();
+      }
+    }
+    ();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Dispose the timer when the widget is disposed
+    _speakTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _initBluetooth() async {
     var scanP = await Permission.bluetoothScan.request();
     var connectP = await Permission.bluetoothConnect.request();
 
@@ -77,33 +107,28 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     }
   }
 
+
   void _speakDeviceNameSequentially() async {
     for (BluetoothDevice device in devicesList) {
       _speakDeviceName(device.platformName);
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 3));
     }
   }
 
-  @override
-  void initState() {
-    () async {
-      var status = await Permission.location.status;
-      if (status.isDenied) {
-        final status = await Permission.location.request();
-        if (status.isGranted || status.isLimited) {
-          _initBluetooth();
-        }
-      } else if (status.isGranted || status.isLimited) {
-        _initBluetooth();
-      }
 
-      if (await Permission.location.status.isPermanentlyDenied) {
-        openAppSettings();
+  void startDeviceSpeakTimer() {
+    int currentIndex = 0;
+    _speakTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
+      if (currentIndex < devicesList.length) {
+        _speakDeviceName(devicesList[currentIndex].platformName);
+        currentIndex++;
+      } else {
+        // Stop the timer when all devices have been spoken
+        timer.cancel();
       }
-    }
-    ();
-    super.initState();
+    });
   }
+
 
   void _speakDeviceName(String name) async {
     await flutterTts.speak(name);
@@ -294,6 +319,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   }
 
 
+  List<bool> isFavoriteList = [];
   ListView _buildView() {
     if (_connectedDevice != null) {
       return _buildConnectDeviceView();
@@ -304,6 +330,75 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        body: _buildView(),
+        body: ListView.builder(
+          itemCount: devicesList.length,
+          itemBuilder: (context, index) {
+            BluetoothDevice device = devicesList[index];
+            if (index >= isFavoriteList.length) {
+              isFavoriteList.add(false);
+            }
+            return GestureDetector(
+              onTap: () {
+                _buildView();
+                // _speakDeviceName(device.platformName == '' ? '(unknown device)' : device.advName);
+              },
+              child: Card(
+                color: Color(0xFFE3E4E5),
+                margin: EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(device.platformName == '' ? '(unknown device)' : device.advName,
+                            style: TextStyle(
+                              color: Color(0xFF72777A),
+                              fontSize: 14,
+                              fontFamily: 'Open Sans',
+                              fontWeight: FontWeight.w600,
+                            ),),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.share_outlined,
+                                  color: Colors.grey[700],),
+                                color: Colors.grey,),
+                              IconButton(
+                                icon: Icon(
+                                  isFavoriteList[index]
+                                      ? Icons.favorite_outlined
+                                      : Icons.favorite_outline_rounded,
+                                  color: isFavoriteList[index] ? Colors
+                                      .grey[700] : null,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isFavoriteList[index] =
+                                    !isFavoriteList[index]; // Toggle favorite state
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 25,),
+                      Text(device.remoteId.id,
+                        style: TextStyle(
+                          color: Color(0xFF72777A),
+                          fontSize: 10,
+                          fontFamily: 'Open Sans',
+                          fontWeight: FontWeight.w400,
+                        ),)
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        )
       );
 }

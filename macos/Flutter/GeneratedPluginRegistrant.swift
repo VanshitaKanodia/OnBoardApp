@@ -6,7 +6,6 @@ import FlutterMacOS
 import Foundation
 
 import flutter_blue
-<<<<<<< Updated upstream
 import flutter_blue_plus
 import flutter_tts
 import smart_auth
@@ -16,9 +15,4 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterBluePlusPlugin.register(with: registry.registrar(forPlugin: "FlutterBluePlusPlugin"))
   FlutterTtsPlugin.register(with: registry.registrar(forPlugin: "FlutterTtsPlugin"))
   SmartAuthPlugin.register(with: registry.registrar(forPlugin: "SmartAuthPlugin"))
-=======
-
-func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  FlutterBluePlugin.register(with: registry.registrar(forPlugin: "FlutterBluePlugin"))
->>>>>>> Stashed changes
 }
