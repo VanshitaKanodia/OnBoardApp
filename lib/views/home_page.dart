@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iwayplus_bluetooth/views/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
 import 'package:iwayplus_bluetooth/views/query.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +17,36 @@ class _HomePageState extends State<HomePage> {
   bool isQueryEnabled = false;
   bool isAutoQueryEnabled = false;
   bool isFavouriteModeEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestBluetoothPermission();
+  }
+
+  void _requestBluetoothPermission() async {
+    var status = await Permission.bluetooth.request();
+    if (!status.isGranted) {
+      if (status.isDenied) {
+        // Permission is denied but not permanently
+        var reRequestStatus = await Permission.bluetooth.request();
+        if (reRequestStatus.isGranted) {
+          // Permission granted after re-requesting
+          // Handle the permission granted state
+        } else {
+          // Permission still not granted after re-requesting
+          // Handle the denied state
+          // You can show a dialog explaining why the permission is necessary
+          // and provide an option for the user to grant the permission manually
+        }
+      } else {
+        // Permission is denied permanently
+        // Handle the permanently denied state
+        // You can show a dialog explaining why the permission is necessary
+        // and provide an option for the user to go to settings and manually grant the permission
+      }
+    }
+  }
 
   // void _toggleQuery(bool value) {
   //   setState(() {
@@ -58,129 +89,128 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                iconSize: 23,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              iconSize: 23,
+              color: Color(0xFF72777A),
+              icon: Icon(Icons.arrow_back_ios),
+              onPressed: () {
+                // Handle back button pressed
+              },
+            ),
+            Text(
+              _currentPageIndex == 0 ? 'Query' : (_currentPageIndex == 1 ? 'Auto Query' : 'Favourites'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 color: Color(0xFF72777A),
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  // Handle back button pressed
-                },
-              ),
-              Text(
-                _currentPageIndex == 0 ? 'Query' : (_currentPageIndex == 1 ? 'Auto Query' : 'Favourites'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'Open Sans',
+                fontWeight: FontWeight.w600,
+                height: 0.05,
+              )
+            ),
+            Row(
+              children: [
+                IconButton(
+                  iconSize: 25,
                   color: Color(0xFF72777A),
-                  fontSize: 18,
-                  fontFamily: 'Open Sans',
-                  fontWeight: FontWeight.w600,
-                  height: 0.05,
-                )
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    iconSize: 25,
-                    color: Color(0xFF72777A),
-                    icon: Icon(Icons.notifications_active),
-                    onPressed: () {
-                      // Handle notification button pressed
-                    },
-                  ),
-                  IconButton(
-                    iconSize: 25,
-                    color: Color(0xFF72777A),
-                    icon: Icon(Icons.account_circle),
-                    onPressed: () {
-                      // Handle profile button pressed
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
+                  icon: Icon(Icons.notifications_active),
+                  onPressed: () {
+                    // Handle notification button pressed
+                  },
+                ),
+                IconButton(
+                  iconSize: 25,
+                  color: Color(0xFF72777A),
+                  icon: Icon(Icons.account_circle),
+                  onPressed: () {
+                    // Handle profile button pressed
+                    Navigator.pushNamed(context, 'profile_page');
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-        body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
-                  width: 327,
-                  height: 48,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1,
-                        // strokeJoin: StrokeJoin.round,
-                        color: Color(0xFF72777A),
-                      ),
-                      borderRadius: BorderRadius.circular(8),
+      ),
+      body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(
+                width: 327,
+                height: 48,
+                decoration: ShapeDecoration(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      width: 1,
+                      // strokeJoin: StrokeJoin.round,
+                      color: Color(0xFF72777A),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search Bus',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10),
-                          ),
-                          style: TextStyle(
-                            color: Color(0xFF72777A),
-                            fontSize: 16,
-                            fontFamily: 'Open Sans',
-                            fontWeight: FontWeight.w400,
-                            height: 0.06,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        iconSize: 25,
-                        color: Color(0xFF72777A),
-                        icon: Icon(Icons.mic),
-                        onPressed: () {
-                          // Implement audio search functionality here
-                        },
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-              ),
-              Expanded(
-                child: _buildBody()
-              ),
-
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                color: Colors.transparent,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem('Query', 0),
-                    _buildNavItem('Auto Query', 1),
-                    _buildNavItem('Favourites', 2),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search Bus',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10),
+                        ),
+                        style: TextStyle(
+                          color: Color(0xFF72777A),
+                          fontSize: 16,
+                          fontFamily: 'Open Sans',
+                          fontWeight: FontWeight.w400,
+                          height: 0.06,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      iconSize: 25,
+                      color: Color(0xFF72777A),
+                      icon: Icon(Icons.mic),
+                      onPressed: () {
+                        // Implement audio search functionality here
+                      },
+                    ),
                   ],
                 ),
               ),
-            ]
-        ),
+            ),
+            Expanded(
+              child: _buildBody()
+            ),
 
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              color: Colors.transparent,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem('Query', 0),
+                  _buildNavItem('Auto Query', 1),
+                  _buildNavItem('Favourites', 2),
+                ],
+              ),
+            ),
+          ]
       ),
+
     );
   }
   // @override

@@ -54,15 +54,18 @@ class QueryPageState extends State<QueryPage> {
     if (scanP.isGranted && connectP.isGranted) {
       var subscription = FlutterBluePlus.onScanResults.listen(
             (results) {
-          if (results.isNotEmpty) {
-            for (ScanResult result in results) {
-              if (!_services.contains(result.device) &&
-                  result.device.advName.startsWith("BM")) {
-                _addDeviceTolist(result.device);
+              if (results.isNotEmpty) {
+                for (ScanResult result in results) {
+                  if (!_services.contains(result.device)
+                      &&
+                      result.device.advName.startsWith("BM")) {
+                    {
+                      _addDeviceTolist(result.device);
+                    }
+                  }
+                }
               }
-            }
-          }
-        },
+            },
         onError: (e) =>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -116,11 +119,16 @@ class QueryPageState extends State<QueryPage> {
       String deviceId = device.id.toString();
 
       void _startConnecting(String deviceId) async {
-        await device.connect();
-        setState(() {
-          // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
-          isDeviceConnected = !isDeviceConnected;
-        });
+        try{
+
+          await device.connect();
+          setState(() {
+            // deviceConnectionStatus[deviceId] = !deviceConnectionStatus[deviceId]!;
+            isDeviceConnected = !isDeviceConnected;
+          });
+        }catch(e){
+          print('error iun coinnecting device $e');
+        }
       }
 
       void _startDisconnectTimer(String deviceId) {
@@ -149,8 +157,7 @@ class QueryPageState extends State<QueryPage> {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    Text(device.platformName == '' ? '(unknown device)' : device
-                        .advName),
+                    Text(device.platformName == '' ? '(unknown device)' : device.advName),
                     Text(device.remoteId.toString()),
                   ],
                 ),
@@ -165,12 +172,10 @@ class QueryPageState extends State<QueryPage> {
                     if (isDeviceConnected) {
                       _startDisconnectTimer(deviceId);
                     }
-                  } on PlatformException catch (e) {
-                    if (e.code != 'already_connected') {
-                      rethrow;
-                    }
+                  } catch (e) {
+                    print('error $e but outside');
                   } finally {
-                    _services = await device.discoverServices();
+                    // _services = await device.discoverServices();
                   }
                 },
                 style: ButtonStyle(
@@ -361,12 +366,13 @@ class QueryPageState extends State<QueryPage> {
 
   @override
   ListView _buildView() {
+
     if (_connectedDevice != null) {
       print('++++++++++++clicked++++');
       return _buildConnectDeviceView();
     }
     else {
-      print('+++++++++++++');
+      print('+++++++++++++null');
       return _buildListViewOfDevices();
     }
   }
@@ -391,10 +397,13 @@ class QueryPageState extends State<QueryPage> {
           isFavoriteList.add(false);
         }
         return GestureDetector(
-          onTap: () {
+          onTap: () async {
             print('1111111111111111111111');
-            // _buildView();
-              _speakDeviceName(device.platformName == '' ? '(unknown device)' : device.advName);
+            await device.connect().whenComplete(() => setState(() {
+              _connectedDevice = device;_services = device.servicesList;
+            }));
+            _buildView();
+              // _speakDeviceName(device.advName == '' ? 'unknown device' : device.advName);
             print('22222222222222222222222');
           },
           child: Card(
@@ -407,7 +416,7 @@ class QueryPageState extends State<QueryPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(device.platformName == '' ? '(unknown device)' : device.advName,
+                      Text(device.advName == '' ? '(unknown device)' : device.advName,
                         style: TextStyle(
                           color: Color(0xFF72777A),
                           fontSize: 14,

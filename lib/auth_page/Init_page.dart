@@ -14,7 +14,7 @@ class InitPage extends StatelessWidget {
               Container(
                 width: 412.96,
                 height: 412.96,
-                child: Image.asset("assets/img.png"),
+                child: Image.asset("assets/init_img.png"),
               ),
               GestureDetector(
                   onTap: () {

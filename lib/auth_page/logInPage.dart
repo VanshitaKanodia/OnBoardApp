@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:iwayplus_bluetooth/auth_page/otp_screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -63,6 +64,7 @@ class _LogInPageState extends State<LogInPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
+            Navigator.pop(context);
             // Navigator.push(context, MaterialPageRoute(builder: (context) => OtpPage(phoneNum: )));
           },
         ),
@@ -228,7 +230,7 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                       ],
                     ),),
-                  SizedBox(width: 10,),
+                  SizedBox  (width: 10,),
                   Expanded(
                     child: TextField(
                       onChanged: (value)
@@ -269,8 +271,8 @@ class _LogInPageState extends State<LogInPage> {
             ),
                 Column(
                   children: [
-                    ElevatedButton(
-                        onPressed: (){
+                    GestureDetector(
+                        onTap: (){
                           // Construct complete phone number with country code
                           String completePhoneNumber = '${countrycode != null ? countrycode!.dialCode : (countryCode.text + authPhoneNumber.text)}';
                           // Call login function with complete phone number

@@ -26,7 +26,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   Timer? _speakTimer;
 
   Future<void> _addDeviceTolist(final BluetoothDevice device) async {
-    print("checker-------->>>> ${device.platformName}");
+    print("checker-------->>>> ${device.advName}");
     if (!devicesList.contains(device)) {
       setState(() {
         devicesList.add(device);
@@ -133,6 +133,21 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   void _speakDeviceName(String name) async {
     await flutterTts.speak(name);
     await flutterTts.awaitSpeakCompletion(true);
+  }
+
+  String buttonText = 'Mute';
+  Color buttonColor = Colors.blue;
+
+  void _changeTextAndColor() {
+    setState(() {
+      if (buttonText == 'Mute') {
+        buttonText = 'Unmute!';
+        buttonColor = Colors.green;
+      } else {
+        buttonText = 'Mute';
+        buttonColor = Colors.blue;
+      }
+    });
   }
 
   ListView _buildListViewOfDevices() {
@@ -320,6 +335,7 @@ class AutoQueryPageState extends State<AutoQueryPage> {
 
 
   List<bool> isFavoriteList = [];
+
   ListView _buildView() {
     if (_connectedDevice != null) {
       return _buildConnectDeviceView();
@@ -330,75 +346,94 @@ class AutoQueryPageState extends State<AutoQueryPage> {
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        body: ListView.builder(
-          itemCount: devicesList.length,
-          itemBuilder: (context, index) {
-            BluetoothDevice device = devicesList[index];
-            if (index >= isFavoriteList.length) {
-              isFavoriteList.add(false);
-            }
-            return GestureDetector(
-              onTap: () {
-                _buildView();
-                // _speakDeviceName(device.platformName == '' ? '(unknown device)' : device.advName);
-              },
-              child: Card(
-                color: Color(0xFFE3E4E5),
-                margin: EdgeInsets.all(8.0),
-                child: ListTile(
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(device.platformName == '' ? '(unknown device)' : device.advName,
-                            style: TextStyle(
-                              color: Color(0xFF72777A),
-                              fontSize: 14,
-                              fontFamily: 'Open Sans',
-                              fontWeight: FontWeight.w600,
-                            ),),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.share_outlined,
-                                  color: Colors.grey[700],),
-                                color: Colors.grey,),
-                              IconButton(
-                                icon: Icon(
-                                  isFavoriteList[index]
-                                      ? Icons.favorite_outlined
-                                      : Icons.favorite_outline_rounded,
-                                  color: isFavoriteList[index] ? Colors
-                                      .grey[700] : null,
+          body: ListView.builder(
+            itemCount: devicesList.length,
+            itemBuilder: (context, index) {
+              BluetoothDevice device = devicesList[index];
+              if (index >= isFavoriteList.length) {
+                isFavoriteList.add(false);
+              }
+              return Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _buildView();
+                      // _speakDeviceName(device.platformName == '' ? '(unknown device)' : device.advName);
+                    },
+                    child: Card(
+                      color: Color(0xFFE3E4E5),
+                      margin: EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(device.platformName == ''
+                                    ? '(unknown device)'
+                                    : device.advName,
+                                  style: TextStyle(
+                                    color: Color(0xFF72777A),
+                                    fontSize: 14,
+                                    fontFamily: 'Open Sans',
+                                    fontWeight: FontWeight.w600,
+                                  ),),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.share_outlined,
+                                        color: Colors.grey[700],),
+                                      color: Colors.grey,),
+                                    IconButton(
+                                      icon: Icon(
+                                        isFavoriteList[index]
+                                            ? Icons.favorite_outlined
+                                            : Icons.favorite_outline_rounded,
+                                        color: isFavoriteList[index] ? Colors
+                                            .grey[700] : null,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          isFavoriteList[index] =
+                                          !isFavoriteList[index]; // Toggle favorite state
+                                        });
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    isFavoriteList[index] =
-                                    !isFavoriteList[index]; // Toggle favorite state
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                            SizedBox(height: 25,),
+                            Text(device.remoteId.id,
+                              style: TextStyle(
+                                color: Color(0xFF72777A),
+                                fontSize: 10,
+                                fontFamily: 'Open Sans',
+                                fontWeight: FontWeight.w400,
+                              ),),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 25,),
-                      Text(device.remoteId.id,
-                        style: TextStyle(
-                          color: Color(0xFF72777A),
-                          fontSize: 10,
-                          fontFamily: 'Open Sans',
-                          fontWeight: FontWeight.w400,
-                        ),)
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
-        )
+                  SizedBox(height: 50,),
+                  ElevatedButton(
+                    onPressed: _changeTextAndColor,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor, // background color
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: TextStyle(
+                        color: Colors.white, // text color
+                      ),
+                    ),
+                  )
+                ],
+              );
+            },
+          )
       );
 }
