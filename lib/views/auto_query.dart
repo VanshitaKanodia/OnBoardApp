@@ -135,21 +135,6 @@ class AutoQueryPageState extends State<AutoQueryPage> {
     await flutterTts.awaitSpeakCompletion(true);
   }
 
-  String buttonText = 'Mute';
-  Color buttonColor = Colors.blue;
-
-  void _changeTextAndColor() {
-    setState(() {
-      if (buttonText == 'Mute') {
-        buttonText = 'Unmute!';
-        buttonColor = Colors.green;
-      } else {
-        buttonText = 'Mute';
-        buttonColor = Colors.blue;
-      }
-    });
-  }
-
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
     for (BluetoothDevice device in devicesList) {
@@ -418,19 +403,6 @@ class AutoQueryPageState extends State<AutoQueryPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 50,),
-                  ElevatedButton(
-                    onPressed: _changeTextAndColor,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor, // background color
-                    ),
-                    child: Text(
-                      buttonText,
-                      style: TextStyle(
-                        color: Colors.white, // text color
-                      ),
-                    ),
-                  )
                 ],
               );
             },

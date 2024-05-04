@@ -96,14 +96,10 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              iconSize: 23,
-              color: Color(0xFF72777A),
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                // Handle back button pressed
-              },
-            ),
+                _currentPageIndex == 1 ? IconButton(
+                    icon: Image.asset('assets/quill_mute.png',),
+                    onPressed: () {},
+                ) : Icon(null),
             Text(
               _currentPageIndex == 0 ? 'Query' : (_currentPageIndex == 1 ? 'Auto Query' : 'Favourites'),
               textAlign: TextAlign.center,

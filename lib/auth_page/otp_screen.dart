@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:http/http.dart' as http;
@@ -18,54 +19,65 @@ class _OtpPageState extends State<OtpPage> {
 
   OtpFieldController _otpController = OtpFieldController();
 
-  // Assume expectedOTP is the OTP received from the server
+  Future<void> resendVerificationCode(String userPhoneNum) async {
+    try {
+      var headers = {
+        'Content-Type': 'application/json'
+      };
+      var request = await http.Request(
+          'POST', Uri.parse('https://dev.iwayplus.in/auth/otp/send'));
+      request.body = json.encode({
+        "username": userPhoneNum // Use the provided phone number directly
+      });
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+      print(response);
+
+      if (response.statusCode == 200) {
+        print('=====----OTP Resent Successfully---=======');
+        // No need to navigate to OTP page again here
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print('-----Error occurred while sending OTP---:-> $e');
+    }
+  }
+
 
   void verifyOTP(String otp) async {
-    // try{
-    //  var response = await http.post(Uri.parse('https://dev.iwayplus.in/auth/otp/token'),
-    //  body: {
-    //    'username' : widget.phoneNum,
-    //    'otp' : otp.toString(),
-    //  });
-    //  if(response.statusCode == 200) {
-    //    Navigator.pushNamed(context, 'home_page');
-    //  }
-    //  else
-    //    {
-    //      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //          content: Text('OTP Verification failed. Please try again'),
-    //      ));
-    //    }
+    try {
+      var headers = {
+        'Content-Type': 'application/json'
+      };
+      var request = http.Request(
+          'POST', Uri.parse('https://dev.iwayplus.in/auth/otp/token'));
+      request.body = json.encode({
+        'username': '+919729391756',
+        'otp': otp
+      });
+      request.headers.addAll(headers);
 
-    var headers = {
-      'Content-Type': 'application/json'
-    };
-    var request = http.Request('POST', Uri.parse('https://dev.iwayplus.in/auth/otp/token'));
-    request.body = json.encode({
-      'username': '+919729391756',
-      'otp': otp
-    });
-    request.headers.addAll(headers);
+      http.StreamedResponse response = await request.send();
 
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print('-----OTP Verified Successfully------');
-         print(await response.stream.bytesToString());
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('-----OTP Verified Successfully------:  ${response.statusCode}');
+        await Navigator.pushNamed(context, 'home_page');
+        print(await response.stream.bytesToString());
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('OTP Verification failed. Please try again'),
+            ));
+        print('---------otp failed $response.reasonPhrase');
+      }
     }
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('OTP Verification failed. Please try again'),
-          ));
-      print('---------otp failed $response.reasonPhrase');
+    catch (e) {
+      print('Error Occured while Verify OTP====: $e');
     }
-
-
-    // }
-    // catch (e){
-    //   print('Error Occured while Verify OTP====: $e');
-    // }
   }
 
   @override
@@ -74,10 +86,12 @@ class _OtpPageState extends State<OtpPage> {
         child: Scaffold(
           appBar: AppBar(
             leading: Builder(
-              builder: (BuildContext Context){
+              builder: (BuildContext Context) {
                 return IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
-                  onPressed: () { Navigator.pop(context); },);
+                  icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },);
               },
             ),
             actions: [
@@ -120,7 +134,7 @@ class _OtpPageState extends State<OtpPage> {
                   child: OTPTextField(
                     controller: _otpController,
                     length: 6,
-                        // Set the length to 6 digits
+                    // Set the length to 6 digits
                     textFieldAlignment: MainAxisAlignment.spaceAround,
                     fieldWidth: 30,
                     // Increase the field width to accommodate 6 digits
@@ -149,7 +163,6 @@ class _OtpPageState extends State<OtpPage> {
                     onTap: () async {
                       String enteredOTP = _otpController.toString();
                       verifyOTP(enteredOTP);
-                      await Navigator.pushNamed(context, 'home_page');
                     },
                     child: Column(
                       children: [
@@ -178,7 +191,11 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                         ),
                         TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              print('printing number');
+                              print(widget.phoneNum.toString());
+                              resendVerificationCode(widget.phoneNum);
+                            },
                             child: const Text(
                               'Resend Code',
                               style: TextStyle(
@@ -186,7 +203,6 @@ class _OtpPageState extends State<OtpPage> {
                                 fontSize: 14,
                                 fontFamily: 'Open Sans',
                                 fontWeight: FontWeight.w600,
-                                height: 0.11,
                               ),
                             )),
                       ],

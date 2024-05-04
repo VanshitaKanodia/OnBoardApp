@@ -1,74 +1,56 @@
 List<Map<String, dynamic>> BusData = [
   {
-    "busNumber": "BUS001",
-    "source": "Source A",
-    "destination": "Destination B",
-    "numberOfStops": 5,
-    "stops": [
+    "busNumber": "BM-605",
+    "sourceLocation": "Katwaria Sarai",
+    "destinationLocation": "Kidwai Nagar",
+    "startTime": "06:00",
+    "endTime": "20:00",
+    "macId": "B1",
+    "frequency": "30 minutes",
+    "intermediateStops": [
       {
-        "stopName": "Stop 1",
-        "timeStamp": "2024-04-18T08:00:00",
-        "frequency": "Every 15 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "stopName": "Katwaria Sarai",
+        "arrivalTime": "06:30",
+        "departureTime": "06:32",
+        "frequency": "10 minutes",
+        "stopLocation": [25.000, 368.321]
       },
       {
-        "stopName": "Stop 2",
-        "timeStamp": "2024-04-18T08:15:00",
-        "frequency": "Every 20 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "stopName": "Qutub Hotel",
+        "arrivalTime": "06:45",
+        "departureTime": "06:47",
+        "frequency": "10 minutes",
+        "stopLocation": [25.123, 368.456]
       },
       {
-        "stopName": "Stop 3",
-        "timeStamp": "2024-04-18T08:30:00",
-        "frequency": "Every 25 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "stopName": "IIT Gate (Aurobindo Marg)",
+        "arrivalTime": "07:00",
+        "departureTime": "07:02",
+        "frequency": "10 minutes",
+        "stopLocation": [25.234, 368.567]
       },
       {
-        "stopName": "Stop 4",
-        "timeStamp": "2024-04-18T08:45:00",
-        "frequency": "Every 30 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "stopName": "Hauz Khas",
+        "arrivalTime": "07:15",
+        "departureTime": "07:17",
+        "frequency": "10 minutes",
+        "stopLocation": [25.345, 368.678]
       },
       {
-        "stopName": "Stop 5",
-        "timeStamp": "2024-04-18T09:00:00",
-        "frequency": "Every 20 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
+        "stopName": "Safdarjung Hospital / AIIMS",
+        "arrivalTime": "07:30",
+        "departureTime": "07:32",
+        "frequency": "10 minutes",
+        "stopLocation": [25.456, 368.789]
+      },
+      {
+        "stopName": "Kidwai Nagar",
+        "arrivalTime": "07:50",
+        "departureTime": "07:52",
+        "frequency": "10 minutes",
+        "stopLocation": [25.565, 391.781]
       }
-    ]
-  },
-  {
-    "busNumber": "BUS002",
-    "source": "Source B",
-    "destination": "Destination C",
-    "numberOfStops": 3,
-    "stops": [
-      {
-        "stopName": "Stop 1",
-        "timeStamp": "2024-04-18T09:30:00",
-        "frequency": "Every 20 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
-      },
-      {
-        "stopName": "Stop 2",
-        "timeStamp": "2024-04-18T09:50:00",
-        "frequency": "Every 25 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
-      },
-      {
-        "stopName": "Stop 3",
-        "timeStamp": "2024-04-18T10:10:00",
-        "frequency": "Every 30 minutes",
-        "latitude": 37.7749,
-        "longitude": -122.4194
-      }
-    ]
+    ],
+    "busLocation": [28.323, 77.515]
   }
 ];

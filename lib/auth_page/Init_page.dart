@@ -61,7 +61,7 @@ class InitPage extends StatelessWidget {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, 'signUp_screen');
+                                  Navigator.pushNamed(context, 'signUp_page');
                                 },
                                 child: Text('Sign up',
                                   style: TextStyle(
