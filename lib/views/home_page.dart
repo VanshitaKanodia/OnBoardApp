@@ -1,9 +1,11 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:iwayplus_bluetooth/views/auto_query.dart';
+import 'package:iwayplus_bluetooth/screens/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
-import 'package:iwayplus_bluetooth/views/query.dart';
+import 'package:iwayplus_bluetooth/screens/query.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:audio_service/audio_service.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,12 +19,14 @@ class _HomePageState extends State<HomePage> {
   bool isQueryEnabled = false;
   bool isAutoQueryEnabled = false;
   bool isFavouriteModeEnabled = false;
+  AudioService audioService = AudioService();
 
   @override
   void initState() {
     super.initState();
     _requestBluetoothPermission();
   }
+
 
   void _requestBluetoothPermission() async {
     var status = await Permission.bluetooth.request();
@@ -98,7 +102,9 @@ class _HomePageState extends State<HomePage> {
           children: [
                 _currentPageIndex == 1 ? IconButton(
                     icon: Image.asset('assets/quill_mute.png',),
-                    onPressed: () {},
+                    onPressed: () {
+
+                    },
                 ) : Icon(null),
             Text(
               _currentPageIndex == 0 ? 'Query' : (_currentPageIndex == 1 ? 'Auto Query' : 'Favourites'),
@@ -209,26 +215,6 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
-  // @override
-  // Widget buildNav(BuildContext context) {
-  //   return Scaffold(
-  //     body: Center(
-  //       child: _buildBody(),
-  //     ),
-  //     bottomNavigationBar: Container(
-  //       padding: EdgeInsets.symmetric(vertical: 10),
-  //       color: Colors.grey[200],
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //         children: [
-  //           _buildNavItem('Query', 0),
-  //           _buildNavItem('Auto Query', 1),
-  //           _buildNavItem('Favourites', 2),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildNavItem(String title, int index) {
     return GestureDetector(

@@ -5,13 +5,14 @@ import 'package:iwayplus_bluetooth/auth_page/otp_screen.dart';
 import 'package:iwayplus_bluetooth/auth_page/logInPage.dart';
 import 'package:iwayplus_bluetooth/auth_page/profile_page.dart';
 import 'package:iwayplus_bluetooth/auth_page/signup_page.dart';
-import 'package:iwayplus_bluetooth/views/auto_query.dart';
+import 'package:iwayplus_bluetooth/screens/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/home_page.dart';
 import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
-import 'package:iwayplus_bluetooth/views/query.dart';
+import 'package:iwayplus_bluetooth/screens/query.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: 'init_page',
+        initialRoute: 'home_page',
         routes: {
           'init_page' : (context) => InitPage(),
           'logIn_page' : (context) => LogInPage(),

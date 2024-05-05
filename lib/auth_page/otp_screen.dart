@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
@@ -55,7 +56,7 @@ class _OtpPageState extends State<OtpPage> {
       var request = http.Request(
           'POST', Uri.parse('https://dev.iwayplus.in/auth/otp/token'));
       request.body = json.encode({
-        'username': '+919729391756',
+        'username': '${widget.phoneNum}',
         'otp': otp
       });
       request.headers.addAll(headers);
@@ -117,7 +118,7 @@ class _OtpPageState extends State<OtpPage> {
                 ),
                 SizedBox(height: 20,),
                 const Text(
-                  'Enter the 4-digit code that we have sent via the phone number +91 1234567890',
+                  'Enter the 4-digit code that we have sent via the phone number',
                   style: TextStyle(
                     color: Color(0xFF090A0A),
                     fontSize: 16,
@@ -190,21 +191,25 @@ class _OtpPageState extends State<OtpPage> {
                             ),
                           ),
                         ),
-                        TextButton(
-                            onPressed: () {
-                              print('printing number');
-                              print(widget.phoneNum.toString());
-                              resendVerificationCode(widget.phoneNum);
-                            },
-                            child: const Text(
-                              'Resend Code',
-                              style: TextStyle(
-                                color: Color(0xFF2563EB),
-                                fontSize: 14,
-                                fontFamily: 'Open Sans',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
+                        Semantics(
+                          label: 'Resend button',
+                          hint: 'Double tap to resend',
+                          child: TextButton(
+                              onPressed: () {
+                                print('printing number');
+                                print(widget.phoneNum.toString());
+                                resendVerificationCode(widget.phoneNum);
+                              },
+                              child: const Text(
+                                'Resend Code',
+                                style: TextStyle(
+                                  color: Color(0xFF2563EB),
+                                  fontSize: 14,
+                                  fontFamily: 'Open Sans',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )),
+                        ),
                       ],
                     )),
               ],
