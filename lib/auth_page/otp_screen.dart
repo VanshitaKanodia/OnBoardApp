@@ -28,7 +28,7 @@ class _OtpPageState extends State<OtpPage> {
       var request = await http.Request(
           'POST', Uri.parse('https://dev.iwayplus.in/auth/otp/send'));
       request.body = json.encode({
-        "username": userPhoneNum // Use the provided phone number directly
+        "username": '${userPhoneNum}' // Use the provided phone number directly
       });
 
       request.headers.addAll(headers);
@@ -73,7 +73,7 @@ class _OtpPageState extends State<OtpPage> {
             SnackBar(
               content: Text('OTP Verification failed. Please try again'),
             ));
-        print('---------otp failed $response.reasonPhrase');
+        print('---------otp failed ${response.statusCode}');
       }
     }
     catch (e) {
@@ -96,7 +96,9 @@ class _OtpPageState extends State<OtpPage> {
               },
             ),
             actions: [
-              TextButton(onPressed: () {}, child: const Text('Change Number'))
+              TextButton(onPressed: () {
+                Navigator.pop(context);
+              }, child: const Text('Change Number'))
             ],
           ),
           body: Padding(

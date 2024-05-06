@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class QueryPage extends StatefulWidget {
   QueryPage({Key? key}) : super(key: key);
+  // final List<BluetoothDevice> favouriteDevices;
 
   @override
   QueryPageState createState() => QueryPageState();
@@ -28,6 +29,17 @@ class QueryPageState extends State<QueryPage> {
   FlutterTts flutterTts = FlutterTts();
   bool isDeviceConnected = true;
   Map<String, bool> deviceConnectionStatus = {};
+
+  List<BluetoothDevice> favoriteDevicesList = <BluetoothDevice>[];
+
+  // Function to add a favorite device to the list
+  void _addToFavorites(BluetoothDevice device) {
+    if (!favoriteDevicesList.contains(device)) {
+      setState(() {
+        favoriteDevicesList.add(device);
+      });
+    }
+  }
 
 
   _addDeviceTolist(final BluetoothDevice device) {
@@ -108,15 +120,18 @@ class QueryPageState extends State<QueryPage> {
     super.initState();
   }
 
-  void _speakDeviceName(String name) async {
-    print(name);
-    await flutterTts.speak(name);
-  }
+  // void _speakDeviceName(String name) async {
+  //   print(name);
+  //   await flutterTts.speak(name);
+  // }
 
   ListView _buildListViewOfDevices() {
     List<Widget> containers = <Widget>[];
     for (BluetoothDevice device in devicesList) {
+
+
       String deviceId = device.id.toString();
+
 
       void _startConnecting(String deviceId) async {
         try{
@@ -130,6 +145,7 @@ class QueryPageState extends State<QueryPage> {
           print('error iun coinnecting device $e');
         }
       }
+
 
       void _startDisconnectTimer(String deviceId) {
         disconnectTimers[deviceId] = Timer(Duration(seconds: 2), () {
@@ -149,56 +165,138 @@ class QueryPageState extends State<QueryPage> {
         }
       }
 
-      containers.add(
-        SizedBox(
-          height: 50,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Text(device.platformName == '' ? '(unknown device)' : device.advName),
-                    Text(device.remoteId.toString()),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  // deviceConnectionStatus[deviceId] == true ? null : () => _toggleConnection(deviceId);
-                  FlutterBluePlus.stopScan();
-                  try {
-                    // await device.connect();
-                    _startConnecting(deviceId);
-                    if (isDeviceConnected) {
-                      _startDisconnectTimer(deviceId);
-                    }
-                  } catch (e) {
-                    print('error $e but outside');
-                  } finally {
-                    // _services = await device.discoverServices();
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                      states) {
-                    if (isDeviceConnected) {
-                      return Colors.grey;
-                    } else {
-                      return Colors.green;
-                    }
-                  }),
-                ),
-                child: Text(
-                  isDeviceConnected == true
-                      ? 'Connect'
-                      : 'Connected',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
 
-            ],
-          ),
-        ),
+
+      List<bool> isFavoriteList = [];
+
+      containers.add(
+        // SizedBox(
+        //   height: 50,
+        //   child: Row(
+        //     children: <Widget>[
+        //       Expanded(
+        //         child: Column(
+        //           children: <Widget>[
+        //             Text(device.platformName == '' ? '(unknown device)' : device.advName),
+        //             Text(device.remoteId.toString()),
+        //           ],
+        //         ),
+        //       ),
+        //       TextButton(
+        //         onPressed: () async {
+        //           // deviceConnectionStatus[deviceId] == true ? null : () => _toggleConnection(deviceId);
+        //           FlutterBluePlus.stopScan();
+        //           try {
+        //             // await device.connect();
+        //             _startConnecting(deviceId);
+        //             if (isDeviceConnected) {
+        //               _startDisconnectTimer(deviceId);
+        //             }
+        //           } catch (e) {
+        //             print('error $e but outside');
+        //           } finally {
+        //             // _services = await device.discoverServices();
+        //           }
+        //         },
+        //         style: ButtonStyle(
+        //           backgroundColor: MaterialStateProperty.resolveWith<Color>((
+        //               states) {
+        //             if (isDeviceConnected) {
+        //               return Colors.grey;
+        //             } else {
+        //               return Colors.green;
+        //             }
+        //           }),
+        //         ),
+        //         child: Text(
+        //           isDeviceConnected == true
+        //               ? 'Connect'
+        //               : 'Connected',
+        //           style: TextStyle(color: Colors.black),
+        //         ),
+        //       ),
+        //
+        //     ],
+        //   ),
+        // ),
+          ListView.builder(
+            itemCount: devicesList.length,
+            itemBuilder: (context, index) {
+              BluetoothDevice device = devicesList[index];
+              print(device);
+              if (index >= isFavoriteList.length) {
+                isFavoriteList.add(false);
+              }
+              return GestureDetector(
+                onTap: () async {
+                  print('1111111111111111111111');
+                  await device.connect().whenComplete(() => setState(() {
+                    _connectedDevice = device;_services = device.servicesList;
+                  }));
+                  _buildView();
+                  // _speakDeviceName(device.advName == '' ? 'unknown device' : device.advName);
+                  print('22222222222222222222222');
+                },
+                child: Card(
+                  color: Color(0xFFE3E4E5),
+                  margin: EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(device.advName == '' ? '(unknown device)' : device.advName,
+                              style: TextStyle(
+                                color: Color(0xFF72777A),
+                                fontSize: 14,
+                                fontFamily: 'Open Sans',
+                                fontWeight: FontWeight.w600,
+                              ),),
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+
+                                  },
+                                  icon: Icon(Icons.share_outlined,
+                                    color: Colors.grey[700],),
+                                  color: Colors.grey,),
+                                IconButton(
+                                  icon: Icon(
+                                    isFavoriteList[index]
+                                        ? Icons.favorite_outlined
+                                        : Icons.favorite_outline_rounded,
+                                    color: isFavoriteList[index] ? Colors
+                                        .grey[700] : null,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isFavoriteList[index] =
+                                      !isFavoriteList[index];
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 25,),
+                        Text(device.remoteId.id,
+                          style: TextStyle(
+                            color: Color(0xFF72777A),
+                            fontSize: 10,
+                            fontFamily: 'Open Sans',
+                            fontWeight: FontWeight.w400,
+                          ),)
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          )
       );
     }
 
@@ -368,103 +466,21 @@ class QueryPageState extends State<QueryPage> {
   ListView _buildView() {
 
     if (_connectedDevice != null) {
-      print('++++++++++++clicked++++');
+      print('++++++++++++CLICKED++++');
       return _buildConnectDeviceView();
     }
     else {
-      print('+++++++++++++null');
+      print('+++++++++++++NULL++++++');
       return _buildListViewOfDevices();
     }
   }
 
-  // @override
-  // Widget build(BuildContext context) =>
-  //     Scaffold(
-  //       backgroundColor: Colors.white,
-  //       body: _buildView(),
-  //     );
-
-  List<bool> isFavoriteList = [];
-
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: devicesList.length,
-      itemBuilder: (context, index) {
-        BluetoothDevice device = devicesList[index];
-        print(device);
-        if (index >= isFavoriteList.length) {
-          isFavoriteList.add(false);
-        }
-        return GestureDetector(
-          onTap: () async {
-            print('1111111111111111111111');
-            await device.connect().whenComplete(() => setState(() {
-              _connectedDevice = device;_services = device.servicesList;
-            }));
-            _buildView();
-              // _speakDeviceName(device.advName == '' ? 'unknown device' : device.advName);
-            print('22222222222222222222222');
-          },
-          child: Card(
-            color: Color(0xFFE3E4E5),
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(device.advName == '' ? '(unknown device)' : device.advName,
-                        style: TextStyle(
-                          color: Color(0xFF72777A),
-                          fontSize: 14,
-                          fontFamily: 'Open Sans',
-                          fontWeight: FontWeight.w600,
-                        ),),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.share_outlined,
-                              color: Colors.grey[700],),
-                            color: Colors.grey,),
-                          IconButton(
-                            icon: Icon(
-                              isFavoriteList[index]
-                                  ? Icons.favorite_outlined
-                                  : Icons.favorite_outline_rounded,
-                              color: isFavoriteList[index] ? Colors
-                                  .grey[700] : null,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                isFavoriteList[index] =
-                                !isFavoriteList[index]; // Toggle favorite state
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25,),
-                  Text(device.remoteId.id,
-                    style: TextStyle(
-                      color: Color(0xFF72777A),
-                      fontSize: 10,
-                      fontFamily: 'Open Sans',
-                      fontWeight: FontWeight.w400,
-                    ),)
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      Scaffold(
+        backgroundColor: Colors.white,
+        body: _buildView(),
+      );
 }
 
 

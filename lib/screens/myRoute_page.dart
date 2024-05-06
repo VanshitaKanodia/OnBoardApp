@@ -10,6 +10,8 @@ class MyRoutes extends StatefulWidget {
 class _MyRoutesState extends State<MyRoutes> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Center(
+      child: Text('My Routes'),
+    );
   }
 }

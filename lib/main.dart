@@ -7,7 +7,7 @@ import 'package:iwayplus_bluetooth/auth_page/profile_page.dart';
 import 'package:iwayplus_bluetooth/auth_page/signup_page.dart';
 import 'package:iwayplus_bluetooth/screens/auto_query.dart';
 import 'package:iwayplus_bluetooth/views/home_page.dart';
-import 'package:iwayplus_bluetooth/views/myRoute_page.dart';
+import 'package:iwayplus_bluetooth/screens/myRoute_page.dart';
 import 'package:iwayplus_bluetooth/screens/query.dart';
 import 'package:permission_handler/permission_handler.dart';
 
